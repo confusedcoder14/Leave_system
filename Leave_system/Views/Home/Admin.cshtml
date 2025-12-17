@@ -1,0 +1,774 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Leave Management Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Attractive gradient background for the whole page */
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #c7d2fe 100%);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+        }
+
+        /* Add a subtle shadow and rounded corners to main container */
+        .container {
+            background: rgba(255,255,255,0.85);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(60, 72, 107, 0.12);
+            padding: 32px;
+            margin: 40px auto;
+            max-width: 1200px;
+            margin-top: 80px; /* Add margin-top to avoid overlap with fixed navbar */
+        }
+
+        /* Navbar styling */
+        .navbar {
+            background: rgba(30, 41, 59, 0.95);
+            color: #fff;
+            padding: 18px 32px;
+            border-radius: 0 0 18px 18px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 24px;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 8px rgba(30,41,59,0.08);
+        }
+
+        /* Make navbar fixed to top */
+        .fixed-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            border-radius: 0 0 18px 18px;
+            box-shadow: 0 2px 8px rgba(30,41,59,0.08);
+        }
+
+        /* Navbar links */
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+            .navbar a.active, .navbar a:hover {
+                background: #6366f1;
+            }
+
+        /* Top cards styling */
+        .top-cards {
+            display: flex;
+            gap: 32px;
+            margin-bottom: 32px;
+        }
+
+        .card {
+            background: linear-gradient(120deg, #e0e7ff 60%, #f1f5f9 100%);
+            border-radius: 18px;
+            box-shadow: 0 4px 16px rgba(99,102,241,0.08);
+            padding: 28px 36px;
+            flex: 1;
+            text-align: left;
+        }
+
+            .card h3 {
+                margin: 0 0 8px 0;
+                font-weight: 600;
+                color: #3730a3;
+            }
+
+            .card .number {
+                font-size: 2.5rem;
+                font-weight: 700;
+                color: #6366f1;
+            }
+
+            .card .label {
+                color: #64748b;
+                font-size: 1rem;
+            }
+
+        /* Tabs styling */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            background: #e0e7ff;
+            color: #3730a3;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            padding: 12px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+            .tab.active, .tab:hover {
+                background: #6366f1;
+                color: #fff;
+            }
+
+        /* Section styling */
+        .section {
+            background: rgba(243,244,246,0.7);
+            border-radius: 18px;
+            padding: 32px;
+            box-shadow: 0 2px 12px rgba(99,102,241,0.06);
+        }
+
+        /* Leave card styling */
+        .leave-card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(99,102,241,0.08);
+            margin-bottom: 28px;
+            padding: 28px 32px;
+            transition: box-shadow 0.2s;
+        }
+
+            .leave-card:hover {
+                box-shadow: 0 6px 24px rgba(99,102,241,0.16);
+            }
+
+        .leave-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+            .leave-header h3 {
+                margin: 0;
+                font-size: 1.3rem;
+                font-weight: 700;
+                color: #3730a3;
+            }
+
+            .leave-header p {
+                margin: 0;
+                color: #64748b;
+            }
+
+        .badge {
+            background: #fef3c7;
+            color: #b45309;
+            border-radius: 8px;
+            padding: 6px 18px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .leave-info {
+            display: flex;
+            gap: 48px;
+            margin-bottom: 10px;
+        }
+
+            .leave-info strong {
+                color: #6366f1;
+            }
+
+        .reason {
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 12px 18px;
+            margin-bottom: 16px;
+            color: #334155;
+            font-size: 1.05rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 18px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 10px 28px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+            .btn.approve {
+                background: #22c55e;
+                color: #fff;
+            }
+
+            .btn.reject {
+                background: #ef4444;
+                color: #fff;
+            }
+
+            .btn.details {
+                background: #6366f1;
+                color: #fff;
+            }
+
+            .btn.logout {
+                background: #3730a3;
+                color: #fff;
+                font-size: 1rem;
+                padding: 10px 24px;
+                border-radius: 8px;
+                font-weight: 600;
+                border: none;
+                cursor: pointer;
+                box-shadow: 0 2px 8px rgba(99,102,241,0.08);
+                transition: background 0.2s;
+            }
+
+                .btn.logout:hover {
+                    background: #57534e;
+                }
+
+        /* Responsive adjustments */
+        @@media screen and (max-width: 768px) {
+            .top-cards {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .navbar {
+                flex-direction: column;
+                padding: 12px;
+            }
+
+                .navbar a {
+                    padding: 10px;
+                    font-size: 1rem;
+                }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .tab {
+                flex: 1 1 100%;
+                text-align: center;
+            }
+
+            .section {
+                padding: 24px;
+            }
+
+            .leave-card {
+                padding: 20px;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 12px;
+                font-size: 1rem;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 999;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 25px;
+            margin: 10% auto;
+            width: 400px;
+            border-radius: 10px;
+        }
+
+        .close-btn {
+            margin-top: 15px;
+            width: 100%;
+            padding: 10px;
+            background: #4CAF50;
+            border: none;
+            border-radius: 5px;
+            color: white;
+        }
+
+        .reportslistsection{
+            display:flex;
+            gap: 35px;
+        }
+
+    </style>
+    
+</head>
+
+<body>
+
+    <!-- Fixed Navbar -->
+    <div class="navbar fixed-navbar">
+        <a class="active" href="@Url.Action("Admin", "Home")"><i class="fa fa-fw fa-home"></i> Home</a>
+        <a href="#"><i class="fa fa-fw fa-envelope"></i> Profile</a>
+        <a href="#"><i class="fa fa-fw fa-envelope"></i> Contact</a>
+        <a href="@Url.Action("AdminLogin", "Home")"><i class="fa fa-fw fa-user"></i> Logout</a>
+    </div>
+
+    <div class="container" style="margin-top:80px;">
+        <div class="top-cards">
+            <div class="card">
+                <h3>Pending Requests</h3>
+                <p class="number"> </p>
+                <p class="label">Awaiting approval</p>
+            </div>
+            <div class="card">
+                <h3>Team Members</h3>
+                <p class="number">12</p>
+                <p class="label">Active employees</p>
+            </div>
+            <div class="card">
+                <h3>This Month</h3>
+                <p class="number">8</p>
+                <p class="label">Approved requests</p>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active">Pending Requests</button>
+            <button class="tab">Team Overview</button>
+            <button class="tab">Reports</button>
+        </div>
+        <!-- PENDING REQUEST SECTION -->
+        <div class="section">
+            <h2>Pending Leave Requests</h2>
+
+            <p class="subtitle">Review and approve employee leave applications</p>
+
+            <div id="pendingContainer"></div>
+            <!-- Leave Card 1 -->
+            <div class="leave-card">
+                <div class="leave-header">
+                    <div>
+                        <h3>Anmol Kumar Gupta</h3>
+                        <p>Engineering</p>
+                    </div>
+                    <span class="badge">Annual Leave</span>
+                </div>
+                <div class="leave-info">
+                    <div>
+                        <strong>Duration</strong>
+                        <p>12/20/2024 - 12/24/2024<br>5 days</p>
+                    </div>
+                    <div>
+                        <strong>Applied Date</strong>
+                        <p>11/15/2024</p>
+                    </div>
+                </div>
+                <div class="reason">
+                    Reason: Christmas vacation with family
+                </div>
+                <div class="actions">
+                    <button class="btn approve" onclick="showSuccess('Application Approved Successfully', 'approve')">✔ Approve</button>
+
+                    <button class="btn reject" onclick="showSuccess('Application Rejected', 'reject')">✖ Reject</button>
+
+                    <button class="btn details" onclick="viewDetails(this)">View Details</button>
+                </div>
+            </div>
+
+            <!-- Leave Card 2 -->
+            <div class="leave-card">
+                <div class="leave-header">
+                    <div>
+                        <h3>Priya Patel</h3>
+                        <p>Marketing</p>
+                    </div>
+                    <span class="badge">Sick Leave</span>
+                </div>
+                <div class="leave-info">
+                    <div>
+                        <strong>Duration</strong>
+                        <p>07/22/2025 - 07/24/2025<br>3 days</p>
+                    </div>
+                    <div>
+                        <strong>Applied Date</strong>
+                        <p>07/20/2025</p>
+                    </div>
+                </div>
+                <div class="reason">
+                    Reason: Recovering from flu
+                </div>
+                <div class="actions">
+                    <button class="btn approve" onclick="showSuccess('Application Approved Successfully', 'approve')">✔ Approve</button>
+
+                    <button class="btn reject" onclick="showSuccess('Application Rejected', 'reject')">✖ Reject</button>
+
+                    <button class="btn details" onclick="viewDetails(this)">View Details</button>
+
+                </div>
+            </div>
+
+            <!-- Leave Card 3 -->
+            <div class="leave-card">
+                <div class="leave-header">
+                    <div>
+                        <h3>Sumit Kumar</h3>
+                        <p>Finance</p>
+                    </div>
+                    <span class="badge">Casual Leave</span>
+                </div>
+                <div class="leave-info">
+                    <div>
+                        <strong>Duration</strong>
+                        <p>08/01/2025 - 08/02/2025<br>2 days</p>
+                    </div>
+                    <div>
+                        <strong>Applied Date</strong>
+                        <p>07/25/2025</p>
+                    </div>
+                </div>
+                <div class="reason">
+                    Reason: Personal work
+                </div>
+                <div class="actions">
+                    <button class="btn approve" onclick="showSuccess('Application Approved Successfully', 'approve')">✔ Approve</button>
+
+                    <button class="btn reject" onclick="showSuccess('Application Rejected', 'reject')">✖ Reject</button>
+
+                    <button class="btn details" onclick="viewDetails(this)">View Details</button>
+
+                </div>
+            </div>
+
+            <!-- Leave Card 4 -->
+            <div class="leave-card">
+                <div class="leave-header">
+                    <div>
+                        <h3>Kiran Verma</h3>
+                        <p>HR</p>
+                    </div>
+                    <span class="badge">Maternity Leave</span>
+                </div>
+                <div class="leave-info">
+                    <div>
+                        <strong>Duration</strong>
+                        <p>09/10/2025 - 12/10/2025<br>3 months</p>
+                    </div>
+                    <div>
+                        <strong>Applied Date</strong>
+                        <p>07/10/2025</p>
+                    </div>
+                </div>
+                <div class="reason">
+                    Reason: Maternity
+                </div>
+                <div class="actions">
+                    <button class="btn approve" onclick="showSuccess('Application Approved Successfully', 'approve')">✔ Approve</button>
+
+                    <button class="btn reject" onclick="showSuccess('Application Rejected', 'reject')">✖ Reject</button>
+
+                    <button class="btn details" onclick="viewDetails(this)">View Details</button>
+
+                </div>
+            </div>
+            </div>
+        <!-- REPORTS SECTION -->
+        <div id="reportsSection" class="section" style="display:none;">
+            <h2>Reports</h2>
+            <button onclick="downloadExcel()"
+                    style="padding:8px 15px; background:blue; color:#fff; border:none; cursor:pointer;">
+                ⬇ Download Excel
+            </button>
+
+            <button onclick="deleteAllReports()"
+                    style="padding:8px 15px; background:red; color:#fff; border:none; cursor:pointer; margin-left:10px;">
+                🗑 Delete All
+            </button>
+            <div class="reportslistsection">
+                <div style="width: 50%;">
+                    <h3 style="margin-top:30px; background: #00ff0d70;">✔ Approved Applications</h3>
+                    <div id="approvedList"></div>
+                </div>
+                <div style="width: 50%;">
+                    <h3 style="margin-top:30px; background: #ff000070;">✖ Rejected Applications</h3>
+                    <div id="rejectedList"></div>
+                </divc>
+            </div>
+        </div>
+
+            </div>
+            </div>
+        
+    <!-- SUCCESS MODAL -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h3 id="successTitle">Success</h3>
+            <p id="successMessage"></p>
+            <button onclick="closeModal()" class="close-btn">OK</button>
+        </div>
+    </div>
+
+    <!-- DETAILS + EDIT MODAL -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <h2>Leave Details</h2>
+
+            <label>Name:</label>
+            <input id="dName" type="text">
+
+            <label>Department:</label>
+            <input id="dDept" type="text">
+
+            <label>Leave Type:</label>
+            <input id="dType" type="text">
+
+            <label>Duration:</label>
+            <input id="dDuration" type="text">
+
+            <label>Applied Date:</label>
+            <input id="dApplied" type="text">
+
+            <label>Reason:</label>
+            <textarea id="dReason"></textarea>
+
+            <button onclick="saveChanges()" class="btn approve">Save</button>
+            <button onclick="closeDetailsModal()" class="btn reject">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+                // ---------------------- TAB SWITCH ----------------------
+        const tabs = document.querySelectorAll(".tab");
+        const pendingSection = document.querySelector(".section");
+        const reportsSection = document.getElementById("reportsSection");
+
+        tabs[0].addEventListener("click", () => {
+            tabs[0].classList.add("active");
+            tabs[2].classList.remove("active");
+
+            pendingSection.style.display = "block";
+            reportsSection.style.display = "none";
+        });
+
+        tabs[2].addEventListener("click", () => {
+            tabs[2].classList.add("active");
+            tabs[0].classList.remove("active");
+
+            pendingSection.style.display = "none";
+            reportsSection.style.display = "block";
+
+            loadReports();
+        });
+
+                // ------------------ SAVE RECORD TO REPORTS ------------------
+        function saveToReports(card, status) {
+
+            let record = {
+                name: card.querySelector("h3").innerText,
+                dept: card.querySelector(".leave-header p").innerText,
+                type: card.querySelector(".badge").innerText,
+                duration: card.querySelector(".leave-info p").innerText,
+                applied: card.querySelectorAll(".leave-info p")[1].innerText,
+                reason: card.querySelector(".reason").innerText.replace("Reason: ", ""),
+                status: status,
+                date: new Date().toLocaleString()
+            };
+
+            let allReports = JSON.parse(localStorage.getItem("reports")) || [];
+            allReports.push(record);
+
+            localStorage.setItem("reports", JSON.stringify(allReports));
+        }
+
+
+        // -------------------- SUCCESS MODAL ----------------------
+
+               function showSuccess(message, type) {
+
+            let card = event.target.closest(".leave-card");
+
+            // Save in Reports Section
+            saveToReports(card, type === "approve" ? "approved" : "rejected");
+
+            // Remove card from Pending List
+            card.remove();
+
+            updatePendingCount();
+
+            // Show Modal
+            document.getElementById("successMessage").innerText = message;
+            document.getElementById("successTitle").innerText =
+                type === 'approve' ? 'Approved!' : 'Rejected';
+
+            document.getElementById("successModal").style.display = "block";
+        }
+
+
+                // ------------------ LOAD REPORT DATA ------------------
+        function loadReports() {
+            let reports = JSON.parse(localStorage.getItem("reports")) || [];
+
+            let approvedHTML = "";
+            let rejectedHTML = "";
+
+            reports.forEach(r => {
+                let card = `
+                    <div class="leave-card">
+                        <h3>${r.name}</h3>
+                        <p>${r.dept}</p>
+                        <p><strong>${r.type}</strong></p>
+                        <p>${r.duration}</p>
+                        <p>${r.applied}</p>
+                        <p>${r.reason}</p>
+                        <small>${r.date}</small>
+                    </div>
+                `;
+
+                if (r.status === "approved") {
+                    approvedHTML += card;
+                } else {
+                    rejectedHTML += card;
+                }
+            });
+
+            document.getElementById("approvedList").innerHTML = approvedHTML;
+            document.getElementById("rejectedList").innerHTML = rejectedHTML;
+        }
+
+
+
+        function closeModal() {
+            document.getElementById("successModal").style.display = "none";
+        }
+
+        // -------------------- VIEW DETAILS MODAL ----------------------
+
+        let currentCard;
+
+        function viewDetails(btn) {
+            currentCard = btn.closest(".leave-card");
+
+            document.getElementById("dName").value =
+                currentCard.querySelector("h3").innerText;
+
+            document.getElementById("dDept").value =
+                currentCard.querySelector(".leave-header p").innerText;
+
+            document.getElementById("dType").value =
+                currentCard.querySelector(".badge").innerText;
+
+            document.getElementById("dDuration").value =
+                currentCard.querySelector(".leave-info p").innerText;
+
+            document.getElementById("dApplied").value =
+                currentCard.querySelectorAll(".leave-info p")[1].innerText;
+
+            document.getElementById("dReason").value =
+                currentCard.querySelector(".reason").innerText.replace("Reason: ", "");
+
+            document.getElementById("detailsModal").style.display = "block";
+        }
+
+        function closeDetailsModal() {
+            document.getElementById("detailsModal").style.display = "none";
+        }
+
+        // -------------------- SAVE CHANGES ----------------------
+
+        function saveChanges() {
+            currentCard.querySelector("h3").innerText = document.getElementById("dName").value;
+            currentCard.querySelector(".leave-header p").innerText = document.getElementById("dDept").value;
+            currentCard.querySelector(".badge").innerText = document.getElementById("dType").value;
+            currentCard.querySelector(".leave-info p").innerText = document.getElementById("dDuration").value;
+            currentCard.querySelectorAll(".leave-info p")[1].innerText = document.getElementById("dApplied").value;
+            currentCard.querySelector(".reason").innerText = "Reason: " + document.getElementById("dReason").value;
+
+            closeDetailsModal();
+            showSuccess("Data updated successfully!", "approve");
+        }
+
+                // -------------------- UPDATE PENDING REQUEST COUNT ----------------------
+        function updatePendingCount() {
+            let totalCards = document.querySelectorAll(".leave-card").length;
+            document.querySelector(".card .number").innerText = totalCards;
+        }
+
+        // Page load hote hi chal jaayega
+        updatePendingCount();
+
+    </script>
+        
+    <script>
+                    // ---------------------- DOWNLOAD EXCEL ----------------------
+            function downloadExcel() {
+                let reports = JSON.parse(localStorage.getItem("reports")) || [];
+
+                if (reports.length === 0) {
+                    alert("No reports available to download.");
+                    return;
+                }
+
+                // Excel Header
+                let csv = "Name,Department,Leave Type,Duration,Applied Date,Reason,Status,Date\n";
+
+                // Add row for each record
+                reports.forEach(r => {
+                    csv += `${r.name},${r.dept},${r.type},${r.duration},${r.applied},${r.reason},${r.status},${r.date}\n`;
+                });
+
+                // Convert CSV to downloadable Excel file
+                let blob = new Blob([csv], { type: "application/vnd.ms-excel" });
+                let url = URL.createObjectURL(blob);
+
+                let a = document.createElement("a");
+                a.href = url;
+                a.download = "Reports_Data.xls";   // Excel file name
+                a.click();
+
+                URL.revokeObjectURL(url);
+            }
+
+
+
+            // ---------------------- DELETE ALL REPORTS ----------------------
+            function deleteAllReports() {
+                if (!confirm("Are you sure you want to delete all report records?")) return;
+
+                localStorage.removeItem("reports"); // delete from storage
+
+                // Clear UI
+                document.getElementById("approvedList").innerHTML = "";
+                document.getElementById("rejectedList").innerHTML = "";
+
+                alert("All reports deleted successfully!");
+            }
+
+    </script>
+</body>
+
+</html>

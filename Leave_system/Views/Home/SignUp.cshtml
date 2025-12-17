@@ -1,0 +1,120 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign Up</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/images/signup-img.jpg');
+            background-size: cover; /* full screen cover */
+            background-repeat: no-repeat; /* repeat band */
+            background-position: center;
+        }
+
+        .container {
+            width: 400px;
+            overflow: hidden;
+            margin: 0 auto;
+            padding: 0px 40px 40px;
+            border-radius: 15px;
+            background-color: #254657;
+            backdrop-filter: blur(8px);
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 35px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+                font-size: 20px;
+            }
+
+            .form-group input {
+                width: 100%;
+                padding: 5px;
+                font-size: 16px;
+            }
+
+            .form-group button {
+                width: 100%;
+                padding: 10px;
+                font-size: 16px;
+                background-color: #4CAF50;
+                color: #fff;
+                border: none;
+                cursor: pointer;
+                border-radius: 35px;
+            }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        @{
+            ViewData["Title"] = "Sign Up";
+        }
+        <h2>Sign Up</h2>
+        @if (ViewBag.Error != null)
+        {
+            <div style="color:red">@ViewBag.Error</div>
+        }
+        <form asp-action="SignUp" method="post">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <label>Firstname:</label>
+                <input type="text" id="firstname" name="FirstName" required>
+            </div>
+
+            <div class="form-group">
+                <label>Lastname:</label>
+                <input type="text" id="lastname" name="LastName" required>
+            </div>
+
+            <div class="form-group">
+                <label>Phone No:</label>
+                <input type="text" id="phone" name="Phone" required>
+            </div>
+
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="email" name="Email" required>
+            </div>
+
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="password" name="Password" required>
+            </div>
+
+            <div class="form-group">
+                <label>Confirm Password:</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+            </div>
+
+            <div class="form-group">
+                <button type="submit">Sign Up</button>
+            </div>
+        </form>
+
+
+      
+
+    </div>
+
+
+
+  
+
+</body>
+</html>
