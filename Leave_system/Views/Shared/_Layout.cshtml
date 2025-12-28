@@ -11,27 +11,31 @@
     <link href="~/css/homepage.css" rel="stylesheet" />
 </head>
 <body>
-  <header>
-    <h1>Welcome to the Leave Application System</h1>
-  </header>
 
-  <nav>
-    <ul>
-      <li><a href="Home/Login">Login</a></li>
-      <li><a href="Home/about">About</a></li>
-      <li><a href="Home/Contact">Contact</a></li>
-      <li><a href="Home/SignUp">Sign Up</a></li>
-    </ul>
-  </nav>
+    <!-- NAVBAR -->
+    <header class="navbar">
+        <div class="logo">LeaveMS</div>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/Home/About">About</a>
+            <a href="/Home/Features">Features</a>
+            <a href="/Home/Contact">Contact</a>
+            <a href="/Home/Login" class="btn-login">Login</a>
+            <a href="/Home/SignUp" class="btn-signup">Sign Up</a>
+        </nav>
+    </header>
 
-    <div class="container">
+
+
+    <div>
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer>
-        <p>&copy; 2023 My Homepage. All rights reserved.</p>
+    <!-- FOOTER -->
+    <footer class="footer">
+        <p>© 2025 Leave Management System | All Rights Reserved</p>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

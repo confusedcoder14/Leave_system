@@ -1,6 +1,10 @@
 ﻿@{
     Layout = null;
 }
+@* @model List<Leave_system.Models.User> *@
+@model Leave_system.Models.AdminViewModel
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -143,7 +147,7 @@
             background: #fff;
             border-radius: 16px;
             box-shadow: 0 2px 12px rgba(99,102,241,0.08);
-            margin-bottom: 28px;
+            margin: 20px;
             padding: 28px 32px;
             transition: box-shadow 0.2s;
         }
@@ -325,6 +329,27 @@
             gap: 35px;
         }
 
+        .team-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+            .team-table th, .team-table td {
+                padding: 12px;
+                border: 1px solid #ddd;
+                text-align: left;
+            }
+
+            .team-table th {
+                background: #1a1f36;
+                color: white;
+            }
+
+            .team-table tr:hover {
+                background: #f5f5f5;
+            }
+
     </style>
     
 </head>
@@ -360,144 +385,108 @@
 
         <div class="tabs">
             <button class="tab active">Pending Requests</button>
-            <button class="tab">Team Overview</button>
+            <button class="tab" onclick="showTeam()">Team Overview</button>
             <button class="tab">Reports</button>
+            <button class="tab">Attendance</button>
         </div>
-        <!-- PENDING REQUEST SECTION -->
-        <div class="section">
+        
+
+        <div class="section" id="pendingSection">
             <h2>Pending Leave Requests</h2>
 
             <p class="subtitle">Review and approve employee leave applications</p>
-
             <div id="pendingContainer"></div>
-            <!-- Leave Card 1 -->
-            <div class="leave-card">
-                <div class="leave-header">
-                    <div>
-                        <h3>Anmol Kumar Gupta</h3>
-                        <p>Engineering</p>
+
+            @if (Model.PendingLeaves != null && Model.PendingLeaves.Any())
+            {
+                foreach (var item in Model.PendingLeaves)
+                {
+                    <div class="leave-card" data-id="@item.Id">
+                        <div class="leave-header">
+                            <div>
+                                <h3>@item.FirstName @item.LastName</h3>
+
+                                <p>Engineering</p>
+                            
+                            </div>
+                            <span class="badge">@item.LeaveType</span>
+                        </div>
+
+                        <div class="leave-info">
+                            <div>
+                            <strong>Duration</strong>
+                            <p>
+                                @item.StartDate?.ToString("dd/MM/yyyy")
+                                -
+                                @item.EndDate?.ToString("dd/MM/yyyy")
+                                </p>
+                            </div>
+                            <div>
+                            <strong>Applied Date</strong>
+                            <p>@item.CreatedAt.ToString("dd/MM/yyyy")</p>
+                            </div>
+                        </div>
+
+                        <div class="reason">
+                            Reason: @item.Reason
+                        </div>
+
+                        <div class="actions">
+                            <button class="btn approve" onclick="approveLeave(@item.Id)">✔ Approve</button>
+                            <button class="btn reject" onclick="rejectLeave(@item.Id)">✖ Reject</button>
+                            <button class="btn details" onclick="viewDetails(this)">View Details</button>
+                        </div>
                     </div>
-                    <span class="badge">Annual Leave</span>
-                </div>
-                <div class="leave-info">
-                    <div>
-                        <strong>Duration</strong>
-                        <p>12/20/2024 - 12/24/2024<br>5 days</p>
-                    </div>
-                    <div>
-                        <strong>Applied Date</strong>
-                        <p>11/15/2024</p>
-                    </div>
-                </div>
-                <div class="reason">
-                    Reason: Christmas vacation with family
-                </div>
-                <div class="actions">
-                    <button class="btn approve" onclick="showSuccess('Application Approved Successfully', 'approve')">✔ Approve</button>
+                }
+            }
+            else
+            {
+                <p>No pending leaves</p>
+            }
 
-                    <button class="btn reject" onclick="showSuccess('Application Rejected', 'reject')">✖ Reject</button>
+        </div>
+   
+        <div id="teamSection" class="section" style="display:none;">
+            <h2>Team Overview</h2>
+            <p class="subtitle">All registered employees</p>
 
-                    <button class="btn details" onclick="viewDetails(this)">View Details</button>
-                </div>
-            </div>
+         
+            <table class="team-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Joined On</th>
+                    </tr>
+                </thead>
 
-            <!-- Leave Card 2 -->
-            <div class="leave-card">
-                <div class="leave-header">
-                    <div>
-                        <h3>Priya Patel</h3>
-                        <p>Marketing</p>
-                    </div>
-                    <span class="badge">Sick Leave</span>
-                </div>
-                <div class="leave-info">
-                    <div>
-                        <strong>Duration</strong>
-                        <p>07/22/2025 - 07/24/2025<br>3 days</p>
-                    </div>
-                    <div>
-                        <strong>Applied Date</strong>
-                        <p>07/20/2025</p>
-                    </div>
-                </div>
-                <div class="reason">
-                    Reason: Recovering from flu
-                </div>
-                <div class="actions">
-                    <button class="btn approve" onclick="showSuccess('Application Approved Successfully', 'approve')">✔ Approve</button>
+                <tbody>
+                    @if (Model.Users != null && Model.Users.Any())
+                    {
+                        foreach (var user in Model.Users)
+                        {
+                            <tr>
+                                <td>@user.FirstName @user.LastName</td>
+                                <td>@user.Email</td>
+                                <td>@user.Phone</td>
+                                <td>@user.JoinedOn.ToString("dd MMM yyyy")</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" style="text-align:center;">No users found</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
 
-                    <button class="btn reject" onclick="showSuccess('Application Rejected', 'reject')">✖ Reject</button>
+        </div>
 
-                    <button class="btn details" onclick="viewDetails(this)">View Details</button>
 
-                </div>
-            </div>
-
-            <!-- Leave Card 3 -->
-            <div class="leave-card">
-                <div class="leave-header">
-                    <div>
-                        <h3>Sumit Kumar</h3>
-                        <p>Finance</p>
-                    </div>
-                    <span class="badge">Casual Leave</span>
-                </div>
-                <div class="leave-info">
-                    <div>
-                        <strong>Duration</strong>
-                        <p>08/01/2025 - 08/02/2025<br>2 days</p>
-                    </div>
-                    <div>
-                        <strong>Applied Date</strong>
-                        <p>07/25/2025</p>
-                    </div>
-                </div>
-                <div class="reason">
-                    Reason: Personal work
-                </div>
-                <div class="actions">
-                    <button class="btn approve" onclick="showSuccess('Application Approved Successfully', 'approve')">✔ Approve</button>
-
-                    <button class="btn reject" onclick="showSuccess('Application Rejected', 'reject')">✖ Reject</button>
-
-                    <button class="btn details" onclick="viewDetails(this)">View Details</button>
-
-                </div>
-            </div>
-
-            <!-- Leave Card 4 -->
-            <div class="leave-card">
-                <div class="leave-header">
-                    <div>
-                        <h3>Kiran Verma</h3>
-                        <p>HR</p>
-                    </div>
-                    <span class="badge">Maternity Leave</span>
-                </div>
-                <div class="leave-info">
-                    <div>
-                        <strong>Duration</strong>
-                        <p>09/10/2025 - 12/10/2025<br>3 months</p>
-                    </div>
-                    <div>
-                        <strong>Applied Date</strong>
-                        <p>07/10/2025</p>
-                    </div>
-                </div>
-                <div class="reason">
-                    Reason: Maternity
-                </div>
-                <div class="actions">
-                    <button class="btn approve" onclick="showSuccess('Application Approved Successfully', 'approve')">✔ Approve</button>
-
-                    <button class="btn reject" onclick="showSuccess('Application Rejected', 'reject')">✖ Reject</button>
-
-                    <button class="btn details" onclick="viewDetails(this)">View Details</button>
-
-                </div>
-            </div>
-            </div>
-        <!-- REPORTS SECTION -->
+        
         <div id="reportsSection" class="section" style="display:none;">
             <h2>Reports</h2>
             <button onclick="downloadExcel()"
@@ -509,21 +498,36 @@
                     style="padding:8px 15px; background:red; color:#fff; border:none; cursor:pointer; margin-left:10px;">
                 🗑 Delete All
             </button>
-            <div class="reportslistsection">
-                <div style="width: 50%;">
-                    <h3 style="margin-top:30px; background: #00ff0d70;">✔ Approved Applications</h3>
-                    <div id="approvedList"></div>
-                </div>
-                <div style="width: 50%;">
-                    <h3 style="margin-top:30px; background: #ff000070;">✖ Rejected Applications</h3>
-                    <div id="rejectedList"></div>
-                </divc>
+
+            <div style="margin-top: 20px;">
+                <table id="reportsTable" border="1" cellspacing="0" cellpadding="5" style="width: 100%; border-collapse: collapse;">
+                    <thead style="background-color: #f0f0f0;">
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Leave Type</th>
+                            <th>Contact</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Reason</th>
+                            <th>Applied On</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportsTableBody">
+                        <!-- Rows will be injected here -->
+                    </tbody>
+                </table>
             </div>
         </div>
 
+  
+
             </div>
-            </div>
+     </div>
         
+
+
+
     <!-- SUCCESS MODAL -->
     <div id="successModal" class="modal">
         <div class="modal-content">
@@ -560,168 +564,120 @@
             <button onclick="closeDetailsModal()" class="btn reject">Cancel</button>
         </div>
     </div>
-
     <script>
-                // ---------------------- TAB SWITCH ----------------------
-        const tabs = document.querySelectorAll(".tab");
-        const pendingSection = document.querySelector(".section");
-        const reportsSection = document.getElementById("reportsSection");
+    const tabs = document.querySelectorAll(".tab");
 
-        tabs[0].addEventListener("click", () => {
-            tabs[0].classList.add("active");
-            tabs[2].classList.remove("active");
+    const pendingSection = document.getElementById("pendingSection");
+    const teamSection = document.getElementById("teamSection");
+    const reportsSection = document.getElementById("reportsSection");
 
-            pendingSection.style.display = "block";
-            reportsSection.style.display = "none";
-        });
+    function hideAllSections() {
+        pendingSection.style.display = "none";
+        teamSection.style.display = "none";
+        reportsSection.style.display = "none";
 
-        tabs[2].addEventListener("click", () => {
-            tabs[2].classList.add("active");
-            tabs[0].classList.remove("active");
+        tabs.forEach(t => t.classList.remove("active"));
+    }
 
-            pendingSection.style.display = "none";
-            reportsSection.style.display = "block";
+    // Pending Tab
+    tabs[0].addEventListener("click", () => {
+        hideAllSections();
+        tabs[0].classList.add("active");
+        pendingSection.style.display = "block";
+    });
 
-            loadReports();
-        });
+    // Team Overview Tab
+    function showTeam() {
+        hideAllSections();
+        tabs[1].classList.add("active");
+        teamSection.style.display = "block";
+    }
 
-                // ------------------ SAVE RECORD TO REPORTS ------------------
-        function saveToReports(card, status) {
-
-            let record = {
-                name: card.querySelector("h3").innerText,
-                dept: card.querySelector(".leave-header p").innerText,
-                type: card.querySelector(".badge").innerText,
-                duration: card.querySelector(".leave-info p").innerText,
-                applied: card.querySelectorAll(".leave-info p")[1].innerText,
-                reason: card.querySelector(".reason").innerText.replace("Reason: ", ""),
-                status: status,
-                date: new Date().toLocaleString()
-            };
-
-            let allReports = JSON.parse(localStorage.getItem("reports")) || [];
-            allReports.push(record);
-
-            localStorage.setItem("reports", JSON.stringify(allReports));
+    // Reports Tab
+    tabs[2].addEventListener("click", () => {
+        hideAllSections();
+        tabs[2].classList.add("active");
+        reportsSection.style.display = "block";
+        loadReports();
+    });
+</script>
+    <script>
+                function formatDate(date) {
+            if (!date) return "";
+            return new Date(date).toLocaleDateString('en-GB');
         }
 
+        function loadReportsFromDB() {
+            fetch('/Home/GetReports')
+                .then(res => res.json())
+                .then(data => {
+                    let rowsHTML = "";
 
-        // -------------------- SUCCESS MODAL ----------------------
+                    data.forEach(r => {
+                        let statusColor =
+                            r.status === "Approved" ? "green" :
+                            r.status === "Rejected" ? "red" : "black";
 
-               function showSuccess(message, type) {
+                        rowsHTML += `
+                            <tr>
+                                <td>${r.firstName} ${r.lastName}</td>
+                                <td>${r.leaveType}</td>
+                                <td>${r.emergencyContact}</td>
+                                <td>${formatDate(r.startDate)}</td>
+                                <td>${formatDate(r.endDate)}</td>
+                                <td>${r.reason}</td>
+                                <td>${formatDate(r.createdAt)}</td>
+                                <td style="color:${statusColor}; font-weight:bold;">
+                                    ${r.status}
+                                </td>
+                            </tr>
+                        `;
+                    });
 
-            let card = event.target.closest(".leave-card");
-
-            // Save in Reports Section
-            saveToReports(card, type === "approve" ? "approved" : "rejected");
-
-            // Remove card from Pending List
-            card.remove();
-
-            updatePendingCount();
-
-            // Show Modal
-            document.getElementById("successMessage").innerText = message;
-            document.getElementById("successTitle").innerText =
-                type === 'approve' ? 'Approved!' : 'Rejected';
-
-            document.getElementById("successModal").style.display = "block";
+                    document.getElementById("reportsTableBody").innerHTML = rowsHTML;
+                });
         }
 
-
-                // ------------------ LOAD REPORT DATA ------------------
-        function loadReports() {
-            let reports = JSON.parse(localStorage.getItem("reports")) || [];
-
-            let approvedHTML = "";
-            let rejectedHTML = "";
-
-            reports.forEach(r => {
-                let card = `
-                    <div class="leave-card">
-                        <h3>${r.name}</h3>
-                        <p>${r.dept}</p>
-                        <p><strong>${r.type}</strong></p>
-                        <p>${r.duration}</p>
-                        <p>${r.applied}</p>
-                        <p>${r.reason}</p>
-                        <small>${r.date}</small>
-                    </div>
-                `;
-
-                if (r.status === "approved") {
-                    approvedHTML += card;
-                } else {
-                    rejectedHTML += card;
-                }
-            });
-
-            document.getElementById("approvedList").innerHTML = approvedHTML;
-            document.getElementById("rejectedList").innerHTML = rejectedHTML;
-        }
-
-
-
-        function closeModal() {
-            document.getElementById("successModal").style.display = "none";
-        }
-
-        // -------------------- VIEW DETAILS MODAL ----------------------
-
-        let currentCard;
-
-        function viewDetails(btn) {
-            currentCard = btn.closest(".leave-card");
-
-            document.getElementById("dName").value =
-                currentCard.querySelector("h3").innerText;
-
-            document.getElementById("dDept").value =
-                currentCard.querySelector(".leave-header p").innerText;
-
-            document.getElementById("dType").value =
-                currentCard.querySelector(".badge").innerText;
-
-            document.getElementById("dDuration").value =
-                currentCard.querySelector(".leave-info p").innerText;
-
-            document.getElementById("dApplied").value =
-                currentCard.querySelectorAll(".leave-info p")[1].innerText;
-
-            document.getElementById("dReason").value =
-                currentCard.querySelector(".reason").innerText.replace("Reason: ", "");
-
-            document.getElementById("detailsModal").style.display = "block";
-        }
-
-        function closeDetailsModal() {
-            document.getElementById("detailsModal").style.display = "none";
-        }
-
-        // -------------------- SAVE CHANGES ----------------------
-
-        function saveChanges() {
-            currentCard.querySelector("h3").innerText = document.getElementById("dName").value;
-            currentCard.querySelector(".leave-header p").innerText = document.getElementById("dDept").value;
-            currentCard.querySelector(".badge").innerText = document.getElementById("dType").value;
-            currentCard.querySelector(".leave-info p").innerText = document.getElementById("dDuration").value;
-            currentCard.querySelectorAll(".leave-info p")[1].innerText = document.getElementById("dApplied").value;
-            currentCard.querySelector(".reason").innerText = "Reason: " + document.getElementById("dReason").value;
-
-            closeDetailsModal();
-            showSuccess("Data updated successfully!", "approve");
-        }
-
-                // -------------------- UPDATE PENDING REQUEST COUNT ----------------------
-        function updatePendingCount() {
-            let totalCards = document.querySelectorAll(".leave-card").length;
-            document.querySelector(".card .number").innerText = totalCards;
-        }
-
-        // Page load hote hi chal jaayega
-        updatePendingCount();
+        loadReportsFromDB();
 
     </script>
+
+
+    <script>
+        function approveLeave(id) {
+            updateLeaveStatus(id, "Approved");
+        }
+
+        function rejectLeave(id) {
+            updateLeaveStatus(id, "Rejected");
+        }
+
+        function updateLeaveStatus(id, status) {
+            fetch('/Home/UpdateLeaveStatus', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id, status: status })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // card remove
+                    document.querySelector(`[data-id='${id}']`).remove();
+                    updatePendingCount();
+
+                    // success modal
+                    document.getElementById("successTitle").innerText = status;
+                    document.getElementById("successMessage").innerText =
+                        `Application ${status} successfully`;
+                    document.getElementById("successModal").style.display = "block";
+
+                    // Reports reload
+                    loadReportsFromDB();
+                }
+            });
+        }
+    </script>
+
         
     <script>
                     // ---------------------- DOWNLOAD EXCEL ----------------------

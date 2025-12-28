@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Leave_system.Models;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 // MVC
@@ -30,8 +29,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();   // 🔥 IMPORTANT (add this)
-
+app.UseStaticFiles();
 app.UseRouting();
 
 app.UseSession();

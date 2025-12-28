@@ -2,6 +2,8 @@
     Layout = null;
 }
 
+@model Leave_system.Models.User;
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,940 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://unpkg.com/@@tabler/icons/iconfont/tabler-icons.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background: #f4f6f8;
-            color: #212529;
-        }
-
-
-        .dashboard {
-            padding: 0px 30px 30px;
-        }
-
-        .headerrr {
-            background-color: #000000;
-            color: white;
-            padding: 5px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .heading {
-            font-size: 28px;
-            font-weight: 700;
-        }
-
-        .breadcrumb {
-            font-size: 14px;
-            color: #6c757d;
-            margin-top: 5px;
-        }
-
-        .breadcrumb-link {
-            color: #6c757d;
-            text-decoration: none;
-            font-weight: 500;
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-
-            .breadcrumb-link:hover {
-                text-decoration: underline;
-                color: #6c757d;
-            }
-
-        .logout-btn {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-            .logout-btn:hover {
-                background-color: #c82333;
-            }
-
-        .alert {
-            margin-top: 20px;
-            background: #e6f4fa;
-            color: #087990;
-            padding: 15px 45px 15px 15px;
-            /* Space for close button */
-            border-radius: 8px;
-            position: relative;
-            font-size: 14px;
-        }
-
-        .close-alert {
-            position: absolute;
-            top: 10px;
-            right: 12px;
-            font-size: 18px;
-            color: #087990;
-            cursor: pointer;
-            font-weight: bold;
-            user-select: none;
-            transition: color 0.2s;
-        }
-
-            .close-alert:hover {
-                color: #055160;
-            }
-
-        .grid {
-            display: flex;
-            margin-top: 20px;
-            gap: 20px;
-            justify-content: space-between;
-        }
-
-        .card {
-            background: #fff;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            flex: 1;
-        }
-
-        .profile-card {
-            max-width: 366px;
-        }
-
-        .profile-header {
-            background: #1a1f36;
-            color: white;
-            display: flex;
-            align-items: center;
-            border-radius: 8px;
-            padding: 20px;
-        }
-
-            .profile-header img {
-                border-radius: 50%;
-                width: 64px;
-                height: 64px;
-                margin-right: 15px;
-                border: 2px solid #fff;
-            }
-
-            .profile-header h2 {
-                font-size: 18px;
-                margin: 0 0 4px 0;
-            }
-
-            .profile-header p {
-                font-size: 14px;
-                margin: 0;
-                color: #ccc;
-            }
-
-        .info {
-            margin-top: 20px;
-        }
-
-            .info p {
-                margin-bottom: 10px;
-                line-height: 1.4;
-                font-size: 14px;
-            }
-
-            .info strong {
-                display: block;
-                font-size: 13px;
-                color: #6c757d;
-            }
-
-        .leave-card {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .leave-header {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .donut-chart {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            background: conic-gradient(#003f5c 0% 60%, #2f4b7c 60% 70%, #ffa600 70% 85%, #ff6361 85% 90%, #bc5090 90% 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-            .donut-chart::after {
-                content: '';
-                width: 90px;
-                height: 90px;
-                border-radius: 50%;
-                background: white;
-                position: absolute;
-            }
-
-        .legend {
-            margin-top: 20px;
-            font-size: 14px;
-        }
-
-            .legend div {
-                margin-bottom: 8px;
-            }
-
-            .legend span {
-                display: inline-block;
-                width: 12px;
-                height: 12px;
-                border-radius: 50%;
-                margin-right: 8px;
-                vertical-align: middle;
-            }
-
-        .right-card {
-            max-width: 323px;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            font-size: 14px;
-            margin-bottom: 62px;
-        }
-
-            .stats div {
-                border-bottom: 1px solid #eee;
-                padding: 5px 0;
-            }
-
-            .stats .value {
-                font-weight: bold;
-                display: block;
-            }
-
-        .btn {
-            display: inline-block;
-            background: #0d1117;
-            color: white;
-            padding: 10px 15px;
-            width: 90%;
-            border-radius: 6px;
-            text-align: center;
-            font-weight: 600;
-            text-decoration: none;
-            margin-top: auto;
-        }
-
-        .year-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .year-btn {
-            background: #f8f9fa;
-            border: 1px solid #ccc;
-            font-size: 14px;
-            padding: 6px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .dropdown-menu {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            margin-top: 5px;
-            background: white;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            z-index: 100;
-            display: none;
-            width: 100%;
-        }
-
-            .dropdown-menu button {
-                background: none;
-                border: none;
-                padding: 8px 12px;
-                width: 100%;
-                text-align: left;
-                cursor: pointer;
-                font-size: 14px;
-            }
-
-                .dropdown-menu button:hover {
-                    background-color: #f1f1f1;
-                }
-
-        .show {
-            display: block;
-        }
-
-        .container {
-            display: flex;
-            gap: 20px;
-            margin: 0 30px 30px;
-            flex-wrap: wrap;
-        }
-
-        .card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            flex: 1;
-            min-width: 180px;
-        }
-
-        .attendance-box {
-            background: #fff4ed;
-            border: 2px solid #f9b98a;
-            min-width: 351px;
-            max-width: 300px;
-            text-align: center;
-        }
-
-            .attendance-box h3 {
-                font-size: 14px;
-                color: #333;
-                font-weight: 400;
-            }
-
-            .attendance-box .time {
-                font-weight: 700;
-                font-size: 18px;
-                color: #222;
-            }
-
-            .attendance-box .circle {
-                margin: 20px auto;
-                width: 160px;
-                height: 160px;
-                border: 6px solid #f3f4f6;
-                border-radius: 50%;
-                display: flex;
-                flex-direction: column;
-                /* stack vertically */
-                align-items: center;
-                justify-content: center;
-                background: white;
-                text-align: center;
-                font-size: 18px;
-            }
-
-        .circle .label {
-            font-weight: 600;
-            margin-bottom: 6px;
-            font-size: 15px;
-            color: #333;
-        }
-
-        .circle .time {
-            font-weight: bold;
-            font-size: 20px;
-            color: #000;
-        }
-
-        .production {
-            display: inline-block;
-            background: #1a1f36;
-            color: white;
-            font-size: 13px;
-            padding: 6px 14px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-
-        .punch-info {
-            margin-top: 5px;
-            font-size: 14px;
-            color: #333;
-        }
-
-        .punch-out {
-            margin-top: 20px;
-            background: #f05423;
-            color: white;
-            font-weight: 600;
-            padding: 12px;
-            border: none;
-            width: 100%;
-            border-radius: 6px;
-            font-size: 15px;
-            cursor: pointer;
-        }
-
-        .info-cards {
-            display: flex;
-            gap: 15px;
-            height: fit-content;
-            flex-wrap: wrap;
-            flex: 2;
-        }
-
-        .info-card {
-            flex: 1;
-            min-width: 150px;
-            background: white;
-            border-radius: 10px;
-            padding: 15px;
-            position: relative;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-            .info-card:hover {
-                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-                transform: translateY(-4px);
-                /* Optional: slight lift effect */
-            }
-
-            .info-card .icon {
-                width: 36px;
-                height: 36px;
-                border-radius: 8px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: white;
-                font-weight: bold;
-                margin-bottom: 10px;
-            }
-
-        .icon.orange {
-            background: #ff6d00;
-        }
-
-        .icon.gray {
-            background: #343a40;
-        }
-
-        .icon.blue {
-            background: #007bff;
-        }
-
-        .icon.pink {
-            background: #e83e8c;
-        }
-
-        .info-card .value {
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .info-card p {
-            font-size: 14px;
-            margin: 3px 0;
-            color: #555;
-        }
-
-        .info-card .note {
-            font-size: 12px;
-            color: #dc3545;
-            margin-top: 5px;
-        }
-
-        .timeline-card {
-            flex: 100%;
-            margin-top: 20px;
-            padding: 20px;
-        }
-
-        .timeline-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-            .timeline-header span {
-                margin-right: 15px;
-            }
-
-        .timeline-progress {
-            display: flex;
-            height: 20px;
-            margin-bottom: 8px;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .green {
-            background: #28a745;
-        }
-
-        .yellow {
-            background: #ffc107;
-        }
-
-
-
-        .block {
-            height: 100%;
-        }
-
-        .timeline-labels {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: #666;
-        }
-
-        .donut-card {
-            display: flex;
-            gap: 82px;
-        }
-
-        .text-below {
-            margin-top: 60px;
-        }
-
-        .info1 {
-            FLEX: AUTO;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 10;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            width: 300px;
-            text-align: center;
-            position: relative;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
-
-            .modal-content h2 {
-                color: #28a745;
-                margin-bottom: 10px;
-            }
-
-            .modal-content p {
-                font-size: 14px;
-                color: #333;
-                margin-bottom: 20px;
-            }
-
-        .close-modal {
-            padding: 8px 16px;
-            background: #1a1f36;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-
-        /* Form Popup Styles */
-
-        .form-box {
-            background: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        h2 {
-            margin-top: 0;
-        }
-
-        .subtitle {
-            color: #6b7280;
-            margin-bottom: 25px;
-        }
-
-        .form-row {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-            .form-group label {
-                font-weight: 500;
-                margin-bottom: 6px;
-            }
-
-        input,
-        select,
-        textarea {
-            padding: 10px;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-
-        textarea {
-            resize: vertical;
-            height: 100px;
-        }
-
-        .full {
-            width: 100%;
-            margin-bottom: 20px;
-        }
-
-        .leave-summary {
-            background-color: #eef4ff;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            color: #1e3a8a;
-            font-size: 15px;
-        }
-
-            .leave-summary .blue {
-                color: #1d4ed8;
-                font-weight: bold;
-            }
-
-        .form-actions {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .submit-btn,
-        .draft-btn {
-            padding: 10px 20px;
-            font-weight: bold;
-            border: none;
-            border-radius: 6px;
-            font-size: 15px;
-            cursor: pointer;
-        }
-
-        .submit-btn {
-            background-color: #000;
-            color: #fff;
-        }
-
-        .draft-btn {
-            background-color: #f9f9f9;
-            border: 1px solid #ccc;
-        }
-
-        .overlay,
-        .success-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-        }
-
-        .form-box,
-        .success-message {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            width: 600px;
-            max-width: 95%;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .close-btn {
-            margin-top: 20px;
-            background-color: #dc3545;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            color: white;
-            cursor: pointer;
-        }
-
-        .success-message h3 {
-            margin-top: 0;
-            color: green;
-        }
-
-        .dashboard-section {
-            display: flex;
-            gap: 20px;
-            justify-content: space-between;
-        }
-
-        .card-box {
-            background: #fff;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .performance-area,
-        .skills-area {
-            flex: 1;
-        }
-
-        .area-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .header-title {
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .year-tag {
-            background: #f0f0f0;
-            padding: 5px 12px;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-
-        .performance-metrics {
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 20px;
-        }
-
-        .performance-score {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            color: #1c1f26;
-        }
-
-        .growth-rate {
-            background: #d1fade;
-            color: #27ae60;
-            font-size: 13px;
-            padding: 3px 8px;
-            border-radius: 14px;
-        }
-
-        .analytics-chart {
-            margin-top: 15px;
-        }
-
-        .skills-list-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 10px;
-        }
-
-        .skill-card {
-            background: #f9fafb;
-            border-radius: 10px;
-            padding: 12px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .skill-details {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .skill-name {
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .skill-date {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .skill-percent {
-            background: #e1e6ed;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: 600;
-            font-size: 14px;
-            color: #555;
-        }
-
-        .sidebar-widgets {
-            width: 280px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .birthday-widget {
-            background: #1f2937;
-            color: white;
-            border-radius: 10px;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .birthday-image {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: 3px solid white;
-            margin: 12px 0;
-        }
-
-        .employee-name {
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .employee-position {
-            font-size: 13px;
-            color: #d1d5db;
-        }
-
-        .wish-button {
-            margin-top: 10px;
-            padding: 8px 16px;
-            background: #f97316;
-            border: none;
-            border-radius: 6px;
-            color: white;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .summary-card {
-            padding: 15px 20px;
-            border-radius: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: white;
-        }
-
-        .update-widget {
-            background: #075985;
-        }
-
-        .holiday-widget {
-            background: #facc15;
-            color: #1c1f26;
-        }
-
-
-
-        .card-label {
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .card-info {
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        .view-button {
-            padding: 6px 12px;
-            background: #000;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-        }
-
-        .holiday-modal {
-            background: #fff;
-            width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            border-radius: 10px;
-            padding: 20px;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .month-title {
-            margin-top: 20px;
-            font-size: 16px;
-            font-weight: bold;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 5px;
-        }
-
-        .holiday-item {
-            padding: 8px 0;
-            border-bottom: 1px dotted #ddd;
-            font-size: 14px;
-            color: #333;
-        }
-
-        .modal-close {
-            background: #dc2626;
-            color: white;
-            border: none;
-            font-size: 14px;
-            padding: 6px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
+    <link href="~/css/user.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -953,12 +22,14 @@
             <div>
                 <div class="heading">Employee Dashboard</div>
                 <div class="breadcrumb">
-                    <a href="Home/User" class="breadcrumb-link">Dashboard</a> / Employee Dashboard
+                    <a href="/Home/User" class="breadcrumb-link">Dashboard</a> / Employee Dashboard
                 </div>
             </div>
 
-            <!-- Logout Button -->
-            <button class="logout-btn" onclick="window.location.href='@Url.Action("Login", "Home")'">Logout</button>
+            <!-- Logout Button 
+            <button class="logout-btn" onclick="window.location.href='@Url.Action("Login", "Home")'">Logout</button>-->
+            <a href="/Home/Logout" class="logout-btn">Logout</a>
+
         </div>
         <div class="alert" id="leaveAlert">
             Your Leave Request on <strong id="currentDate"></strong> has been Approved!!!
@@ -966,23 +37,30 @@
         </div>
 
         <div class="grid">
+            @{
+                if(Model!=null)
+                {
+                    <div class="card profile-card">
+                        <div class="profile-header" style="position: relative;">
+                            <img src="~/images/profile.jpg" />
+                            <div>
+                                <h2 id="nameDisplay">@Model.FirstName @Model.LastName</h2>
+                                <p id="roleDisplay">Full stack Developer</p>
+                            </div>
+                            <button type="button" id="editBtn" class="btn-edit" style="position: absolute; top: 15px; right: 15px;">Edit</button>
+                        </div>
 
-            <!-- Profile Card -->
-            <div class="card profile-card">
-                <div class="profile-header">
-                    <img src="~/images/profile.jpg" />
-                    <div>
-                        <h2>Sumit Kumar</h2>
-                        <p>Senior Product Designer · UI/UX Design</p>
+                        <div class="info">
+                            <p><strong>Phone Number:</strong> <span id="phoneDisplay">@Model.Phone</span></p>
+                            <p><strong>Email Address:</strong> <span id="emailDisplay">@Model.Email</span></p>
+                            <p><strong>Office Location:</strong> <span id="locationDisplay">@Model.Location</span></p>
+                            <p><strong>Joined On:</strong> <span id="joinedDisplay">@Model.JoinedOn.ToString("dd MMM yyyy")</span></p>
+                        </div>
                     </div>
-                </div>
-                <div class="info">
-                    <p><strong>Phone Number</strong> 7766943295</p>
-                    <p><strong>Email Address</strong> sumit694@gmail.com</p>
-                    <p><strong>Report Office</strong> Gurugram, Hariyana</p>
-                    <p><strong>Joined on</strong> 15 Jan 2024</p>
-                </div>
-            </div>
+                }
+            }
+            <!-- Profile Card -->
+            
 
             <!-- Donut Chart + Leave Details -->
             <div class="card leave-card">
@@ -1200,7 +278,7 @@
             <div class="birthday-widget">
                 <div class="header-title">Team Birthday</div>
                 <img src="https://i.pravatar.cc/100?img=5" alt="avatar" class="birthday-image" />
-                <div class="employee-name">Priya Patel</div>
+                <div class="employee-name">Shivam Tiwari</div>
                 <div class="employee-position">DotNet Developer</div>
                 <button class="wish-button">Send Wishes</button>
             </div>
@@ -1211,7 +289,7 @@
                     <div class="card-label">Leave Policy</div>
                     <div class="card-info">Last Updated : Today</div>
                 </div>
-                <button class="view-button">View All</button>
+                <button class="view-button" onclick="openPolicy()">View All</button>
             </div>
 
             <!-- Next Holiday -->
@@ -1226,8 +304,156 @@
         </div>
 
     </div>
+    
+    <div id="editModal">
+        <div class="modal-box">
+            <h3>Edit Profile</h3>
+            <button id="closeModal" class="close-btn">✖</button>
+
+            <form id="editProfileForm">
+                <input type="hidden" id="userId" value="@Model.Id" />
+
+                <label>First Name</label>
+                <input type="text" id="firstNameInput" class="form-control" />
+
+                <label>Last Name</label>
+                <input type="text" id="lastNameInput" class="form-control" />
+
+                <label>Phone</label>
+                <input type="text" id="phoneInput" class="form-control" />
+
+                <label>Email</label>
+                <input type="text" id="emailInput" class="form-control" />
+
+                <label>Location</label>
+                <input type="text" id="locationInput" class="form-control" />
+
+                <!-- VERY IMPORTANT -->
+                <button type="submit" id="saveBtn">Save</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const editBtn = document.getElementById("editBtn");
+            const editModal = document.getElementById("editModal");
+            const closeModal = document.getElementById("closeModal");
+            const form = document.getElementById("editProfileForm");
+
+            // OPEN MODAL + PREFILL DATA
+            editBtn.addEventListener("click", function () {
+
+                document.getElementById("firstNameInput").value =
+                    document.getElementById("nameDisplay").innerText.split(" ")[0];
+
+                document.getElementById("lastNameInput").value =
+                    document.getElementById("nameDisplay").innerText.split(" ")[1] || "";
+
+                document.getElementById("phoneInput").value =
+                    document.getElementById("phoneDisplay").innerText;
+
+                document.getElementById("emailInput").value =
+                    document.getElementById("emailDisplay").innerText;
+
+                document.getElementById("locationInput").value =
+                    document.getElementById("locationDisplay").innerText;
+
+                editModal.style.display = "flex";
+            });
+
+            // CLOSE MODAL
+            closeModal.addEventListener("click", function () {
+                editModal.style.display = "none";
+            });
+
+            // SAVE PROFILE
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                const data = {
+                    Id: document.getElementById("userId").value,
+                    FirstName: document.getElementById("firstNameInput").value,
+                    LastName: document.getElementById("lastNameInput").value,
+                    Phone: document.getElementById("phoneInput").value,
+                    Email: document.getElementById("emailInput").value,
+                    Location: document.getElementById("locationInput").value
+                };
+
+                fetch('/Home/UpdateProfile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                .then(res => res.json())
+                .then(res => {
+                    if (res.success) {
+
+                        // UPDATE PROFILE CARD
+                        document.getElementById("nameDisplay").innerText =
+                            data.FirstName + " " + data.LastName;
+
+                        document.getElementById("phoneDisplay").innerText = data.Phone;
+                        document.getElementById("emailDisplay").innerText = data.Email;
+                        document.getElementById("locationDisplay").innerText = data.Location;
+
+                        // CLOSE MODAL
+                        editModal.style.display = "none";
+                    }
+                    else {
+                        alert(res.message);
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                    alert("Server error");
+                });
+            });
+
+        });
+    </script>
 
 
+    <!-- LEAVE POLICY MODAL -->
+    <div id="policyModal" class="modal">
+        <div class="modal-content">
+
+            <span class="close-btn" onclick="closePolicy()">&times;</span>
+
+            <h2>Leave Policy</h2>
+
+            <div class="policy-section">
+                <h4>Casual Leave</h4>
+                <p>12 casual leaves per year. Prior approval required.</p>
+            </div>
+
+            <div class="policy-section">
+                <h4>Sick Leave</h4>
+                <p>10 sick leaves per year. Medical certificate required for more than 2 days.</p>
+            </div>
+
+            <div class="policy-section">
+                <h4>Earned Leave</h4>
+                <p>Accumulates monthly. Maximum carry forward: 30 days.</p>
+            </div>
+
+            <div class="policy-section">
+                <h4>Maternity / Paternity Leave</h4>
+                <p>Provided as per government and company norms.</p>
+            </div>
+
+            <div class="policy-section">
+                <h4>Approval Rules</h4>
+                <ul>
+                    <li>Manager approval mandatory</li>
+                    <li>Admin has final authority</li>
+                    <li>Emergency leave must be informed</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
 
 
     <!-- Form Popup -->
@@ -1238,9 +464,12 @@
 
             <form id="leaveForm">
                 <div class="form-row">
+                    <input type="hidden" name="FirstName" value="@Model.FirstName" />
+                    <input type="hidden" name="LastName" value="@Model.LastName" />
+
                     <div class="form-group">
                         <label>Leave Type</label>
-                        <select id="leaveType" required name="leaveType">
+                        <select name="LeaveType" id="leaveType" required>
                             <option value="">Select leave type</option>
                             <option value="casual">Casual Leave</option>
                             <option value="sick">Sick Leave</option>
@@ -1253,25 +482,25 @@
 
                     <div class="form-group">
                         <label>Emergency Contact</label>
-                        <input type="text" id="contact" placeholder="Phone number" required name="emergencyContact">
+                        <input name="EmergencyContact" type="text" id="contact" placeholder="Phone number" required >
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label>Start Date</label>
-                        <input type="date" id="startDate" required name="startDate">
+                        <input name="StartDate" type="date" id="startDate" required>
                     </div>
 
                     <div class="form-group">
                         <label>End Date</label>
-                        <input type="date" id="endDate" required name="endDate">
+                        <input name="EndDate" type="date" id="endDate" required>
                     </div>
                 </div>
 
                 <div class="form-group full">
                     <label>Reason for Leave</label>
-                    <textarea id="reason" placeholder="Please provide details..." required name="reason"></textarea>
+                    <textarea name="Reason" id="reason" placeholder="Please provide details..." required></textarea>
                 </div>
 
                 <div class="form-actions">
@@ -1281,6 +510,30 @@
             </form>
         </div>
     </div>
+
+    <script>
+        document.getElementById("leaveForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            fetch("/Home/ApplyLeave", { method: "POST", body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Leave Applied Successfully");
+                        this.reset();
+                    } else {
+                        alert(data.message || "Form submission failed");
+                    }
+                })
+                .catch(err => {
+                    alert("Form submission failed due to server error");
+                    console.error(err);
+                });
+        });
+    </script>
+
+
 
     <!-- Form-popup-Success Modal -->
     <div class="overlay success-modal" id="submitModal">
@@ -1313,6 +566,23 @@
         </div>
     </div>
 
+    <script>
+        function openPolicy() {
+            document.getElementById("policyModal").style.display = "block";
+        }
+
+        function closePolicy() {
+            document.getElementById("policyModal").style.display = "none";
+        }
+
+        // Close popup when clicking outside
+        window.onclick = function (event) {
+            var modal = document.getElementById("policyModal");
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
 
 
     <script>
@@ -1634,35 +904,6 @@
         showNextHoliday();
 
     </script>
-
-    <script>
-        document.getElementById("leaveForm").addEventListener("submit", function (e) {
-            e.preventDefault();
-
-            let form = this;
-
-            let newRequest = {
-                id: Date.now(),
-                leaveType: form.leaveType.value,
-                emergencyContact: form.emergencyContact.value,
-                startDate: form.startDate.value,
-                endDate: form.endDate.value,
-                reason: form.reason.value,
-                status: "pending"
-            };
-
-            let pending = JSON.parse(localStorage.getItem("pendingRequests")) || [];
-            pending.push(newRequest);
-
-            localStorage.setItem("pendingRequests", JSON.stringify(pending));
-
-            // Success modal open
-            document.getElementById("submitModal").style.display = "flex";
-
-            form.reset();
-        });
-    </script>
-
 
 </body>
 

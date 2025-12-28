@@ -1,0 +1,107 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Contact Us - LeaveMS</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background: #f4f6f9;
+        }
+
+        .hero {
+            background: linear-gradient(to right, #1e90ff, #0a3d62);
+            color: white;
+            padding: 70px 20px;
+            text-align: center;
+        }
+
+        .contact-container {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .contact-info,
+        .contact-form {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+            .contact-info h3,
+            .contact-form h3 {
+                margin-bottom: 15px;
+                color: #0a3d62;
+            }
+
+            .contact-info p {
+                color: #555;
+                margin-bottom: 10px;
+            }
+
+            .contact-form input,
+            .contact-form textarea {
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 15px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+
+            .contact-form button {
+                background: #1e90ff;
+                color: white;
+                border: none;
+                padding: 10px 25px;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+                .contact-form button:hover {
+                    background: #0a3d62;
+                }
+
+       
+    </style>
+</head>
+<body>
+
+    <div class="hero">
+        <h1>Contact Us</h1>
+        <p>We are here to help you</p>
+    </div>
+
+    <div class="contact-container">
+
+        <div class="contact-info">
+            <h3>Get in Touch</h3>
+            <p><strong>Email:</strong> support@leavems.com</p>
+            <p><strong>Phone:</strong> +91 9876543210</p>
+            <p><strong>Address:</strong> Raipur, Chhattisgarh, India</p>
+        </div>
+
+        <div class="contact-form">
+            <h3>Send Message</h3>
+            <form>
+                <input type="text" placeholder="Your Name" required>
+                <input type="email" placeholder="Your Email" required>
+                <textarea rows="4" placeholder="Your Message"></textarea>
+                <button type="submit">Send</button>
+            </form>
+        </div>
+
+    </div>
+
+</body>
+</html>

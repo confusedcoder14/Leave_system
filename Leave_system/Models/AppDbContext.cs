@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Leave_system.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Leave_system.Models
 {
@@ -9,5 +10,6 @@ namespace Leave_system.Models
         {
         }
         public DbSet<User> Users { get; set; }
+        public DbSet<LeaveRequest> LeaveRequests { get; set; }
     }
 }
