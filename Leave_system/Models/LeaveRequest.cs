@@ -5,7 +5,7 @@ namespace Leave_system.Models
     public class LeaveRequest
     {
         public int? Id { get; set; }
-
+        public int UserId { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
 
@@ -16,6 +16,10 @@ namespace Leave_system.Models
         public DateTime CreatedAt { get; set; }
         public string? Reason { get; set; }
         public string? Status { get; set; }
+
+        public User User { get; set; }
+
+
     }
 
 }

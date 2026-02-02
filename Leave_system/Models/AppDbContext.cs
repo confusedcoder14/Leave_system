@@ -9,7 +9,11 @@ namespace Leave_system.Models
             : base(options)
         {
         }
+
         public DbSet<User> Users { get; set; }
         public DbSet<LeaveRequest> LeaveRequests { get; set; }
+
+        public DbSet<Attendance> Attendance { get; set; }
+
     }
 }

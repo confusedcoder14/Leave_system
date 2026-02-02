@@ -13,345 +13,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Leave Management Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <link href="~/css/adminpage.css" rel="stylesheet" />
 
-        /* Attractive gradient background for the whole page */
-        body {
-            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #c7d2fe 100%);
-            min-height: 100vh;
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-        }
-
-        /* Add a subtle shadow and rounded corners to main container */
-        .container {
-            background: rgba(255,255,255,0.85);
-            border-radius: 24px;
-            box-shadow: 0 8px 32px rgba(60, 72, 107, 0.12);
-            padding: 32px;
-            margin: 40px auto;
-            max-width: 1200px;
-            margin-top: 80px; /* Add margin-top to avoid overlap with fixed navbar */
-        }
-
-        /* Navbar styling */
-        .navbar {
-            background: rgba(30, 41, 59, 0.95);
-            color: #fff;
-            padding: 18px 32px;
-            border-radius: 0 0 18px 18px;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 24px;
-            font-size: 1.1rem;
-            box-shadow: 0 2px 8px rgba(30,41,59,0.08);
-        }
-
-        /* Make navbar fixed to top */
-        .fixed-navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 100;
-            border-radius: 0 0 18px 18px;
-            box-shadow: 0 2px 8px rgba(30,41,59,0.08);
-        }
-
-        /* Navbar links */
-        .navbar a {
-            color: #fff;
-            text-decoration: none;
-            padding: 8px 18px;
-            border-radius: 8px;
-            transition: background 0.2s;
-        }
-
-            .navbar a.active, .navbar a:hover {
-                background: #6366f1;
-            }
-
-        /* Top cards styling */
-        .top-cards {
-            display: flex;
-            gap: 32px;
-            margin-bottom: 32px;
-        }
-
-        .card {
-            background: linear-gradient(120deg, #e0e7ff 60%, #f1f5f9 100%);
-            border-radius: 18px;
-            box-shadow: 0 4px 16px rgba(99,102,241,0.08);
-            padding: 28px 36px;
-            flex: 1;
-            text-align: left;
-        }
-
-            .card h3 {
-                margin: 0 0 8px 0;
-                font-weight: 600;
-                color: #3730a3;
-            }
-
-            .card .number {
-                font-size: 2.5rem;
-                font-weight: 700;
-                color: #6366f1;
-            }
-
-            .card .label {
-                color: #64748b;
-                font-size: 1rem;
-            }
-
-        /* Tabs styling */
-        .tabs {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .tab {
-            background: #e0e7ff;
-            color: #3730a3;
-            border: none;
-            border-radius: 8px 8px 0 0;
-            padding: 12px 32px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-            .tab.active, .tab:hover {
-                background: #6366f1;
-                color: #fff;
-            }
-
-        /* Section styling */
-        .section {
-            background: rgba(243,244,246,0.7);
-            border-radius: 18px;
-            padding: 32px;
-            box-shadow: 0 2px 12px rgba(99,102,241,0.06);
-        }
-
-        /* Leave card styling */
-        .leave-card {
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 2px 12px rgba(99,102,241,0.08);
-            margin: 20px;
-            padding: 28px 32px;
-            transition: box-shadow 0.2s;
-        }
-
-            .leave-card:hover {
-                box-shadow: 0 6px 24px rgba(99,102,241,0.16);
-            }
-
-        .leave-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-            .leave-header h3 {
-                margin: 0;
-                font-size: 1.3rem;
-                font-weight: 700;
-                color: #3730a3;
-            }
-
-            .leave-header p {
-                margin: 0;
-                color: #64748b;
-            }
-
-        .badge {
-            background: #fef3c7;
-            color: #b45309;
-            border-radius: 8px;
-            padding: 6px 18px;
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .leave-info {
-            display: flex;
-            gap: 48px;
-            margin-bottom: 10px;
-        }
-
-            .leave-info strong {
-                color: #6366f1;
-            }
-
-        .reason {
-            background: #f1f5f9;
-            border-radius: 8px;
-            padding: 12px 18px;
-            margin-bottom: 16px;
-            color: #334155;
-            font-size: 1.05rem;
-        }
-
-        .actions {
-            display: flex;
-            gap: 18px;
-        }
-
-        .btn {
-            border: none;
-            border-radius: 8px;
-            padding: 10px 28px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s, color 0.2s;
-        }
-
-            .btn.approve {
-                background: #22c55e;
-                color: #fff;
-            }
-
-            .btn.reject {
-                background: #ef4444;
-                color: #fff;
-            }
-
-            .btn.details {
-                background: #6366f1;
-                color: #fff;
-            }
-
-            .btn.logout {
-                background: #3730a3;
-                color: #fff;
-                font-size: 1rem;
-                padding: 10px 24px;
-                border-radius: 8px;
-                font-weight: 600;
-                border: none;
-                cursor: pointer;
-                box-shadow: 0 2px 8px rgba(99,102,241,0.08);
-                transition: background 0.2s;
-            }
-
-                .btn.logout:hover {
-                    background: #57534e;
-                }
-
-        /* Responsive adjustments */
-        @@media screen and (max-width: 768px) {
-            .top-cards {
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            .card {
-                padding: 20px;
-            }
-
-            .navbar {
-                flex-direction: column;
-                padding: 12px;
-            }
-
-                .navbar a {
-                    padding: 10px;
-                    font-size: 1rem;
-                }
-
-            .tabs {
-                flex-wrap: wrap;
-            }
-
-            .tab {
-                flex: 1 1 100%;
-                text-align: center;
-            }
-
-            .section {
-                padding: 24px;
-            }
-
-            .leave-card {
-                padding: 20px;
-            }
-
-            .btn {
-                width: 100%;
-                padding: 12px;
-                font-size: 1rem;
-            }
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            z-index: 999;
-        }
-
-        .modal-content {
-            background: #fff;
-            padding: 25px;
-            margin: 10% auto;
-            width: 400px;
-            border-radius: 10px;
-        }
-
-        .close-btn {
-            margin-top: 15px;
-            width: 100%;
-            padding: 10px;
-            background: #4CAF50;
-            border: none;
-            border-radius: 5px;
-            color: white;
-        }
-
-        .reportslistsection{
-            display:flex;
-            gap: 35px;
-        }
-
-        .team-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-            .team-table th, .team-table td {
-                padding: 12px;
-                border: 1px solid #ddd;
-                text-align: left;
-            }
-
-            .team-table th {
-                background: #1a1f36;
-                color: white;
-            }
-
-            .team-table tr:hover {
-                background: #f5f5f5;
-            }
-
-    </style>
-    
 </head>
 
 <body>
@@ -368,125 +31,264 @@
         <div class="top-cards">
             <div class="card">
                 <h3>Pending Requests</h3>
-                <p class="number"> </p>
+                <p class="number" id="pendingCount">0</p>
                 <p class="label">Awaiting approval</p>
             </div>
             <div class="card">
                 <h3>Team Members</h3>
-                <p class="number">12</p>
+                <p class="number" id="teamCount">0</p>
                 <p class="label">Active employees</p>
             </div>
             <div class="card">
-                <h3>This Month</h3>
-                <p class="number">8</p>
-                <p class="label">Approved requests</p>
+                <h3>Today Attendance</h3>
+                <p class="number" id="attendanceCount">0</p>
+                <p class="label">Today Present Employee</p>
             </div>
         </div>
+
+
+
+
+        <script>
+                     function updateTopCards() {
+                // Pending Requests
+                let pendingLeaves = document.querySelectorAll('#pendingContainer .leave-card').length;
+                document.getElementById('pendingCount').textContent = pendingLeaves;
+
+                // Team Members
+                let teamRows = document.querySelectorAll('#teamSection table.team-table tbody tr').length;
+                document.getElementById('teamCount').textContent = teamRows;
+
+                // Today Attendance
+                let attendanceRows = document.querySelectorAll('#attendanceTable tbody tr').length;
+                document.getElementById('attendanceCount').textContent = attendanceRows;
+            }
+
+            // Call it on page load
+            window.addEventListener('load', updateTopCards);
+
+            // Optional: Call it after any approve/reject action if items change dynamically
+
+        </script>
 
         <div class="tabs">
             <button class="tab active">Pending Requests</button>
             <button class="tab" onclick="showTeam()">Team Overview</button>
             <button class="tab">Reports</button>
-            <button class="tab">Attendance</button>
+            <button class="tab" id="attendanceTab">Attendance</button>
         </div>
-        
+
 
         <div class="section" id="pendingSection">
             <h2>Pending Leave Requests</h2>
-
             <p class="subtitle">Review and approve employee leave applications</p>
-            <div id="pendingContainer"></div>
 
-            @if (Model.PendingLeaves != null && Model.PendingLeaves.Any())
+            <!-- ================= Success Message ================= -->
+            @if (TempData["SuccessMessage"] != null)
             {
-                foreach (var item in Model.PendingLeaves)
-                {
-                    <div class="leave-card" data-id="@item.Id">
-                        <div class="leave-header">
-                            <div>
-                                <h3>@item.FirstName @item.LastName</h3>
+                <div class="alert success">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
 
-                                <p>Engineering</p>
-                            
-                            </div>
-                            <span class="badge">@item.LeaveType</span>
-                        </div>
+            <!-- ================= Leave Form ================= -->
+            <div id="leaveFormContainer">
+                <h3 id="formTitle">Apply for Leave</h3>
 
-                        <div class="leave-info">
-                            <div>
-                            <strong>Duration</strong>
-                            <p>
-                                @item.StartDate?.ToString("dd/MM/yyyy")
-                                -
-                                @item.EndDate?.ToString("dd/MM/yyyy")
-                                </p>
-                            </div>
-                            <div>
-                            <strong>Applied Date</strong>
-                            <p>@item.CreatedAt.ToString("dd/MM/yyyy")</p>
-                            </div>
-                        </div>
-
-                        <div class="reason">
-                            Reason: @item.Reason
-                        </div>
-
-                        <div class="actions">
-                            <button class="btn approve" onclick="approveLeave(@item.Id)">✔ Approve</button>
-                            <button class="btn reject" onclick="rejectLeave(@item.Id)">✖ Reject</button>
-                            <button class="btn details" onclick="viewDetails(this)">View Details</button>
-                        </div>
+                <form asp-action="SaveLeave" method="post" class="leave-form">
+                    <input type="hidden" name="Id" id="leaveId" />
+                    <div class="form-group">
+                        <label>Select User</label>
+                        <select id="userSelect" name="UserId" required onchange="fillUserName()">
+                            <option value="">-- Select User --</option>
+                            @foreach (var u in Model.Users)
+                            {
+                                <option value="@u.Id"
+                                        data-fname="@u.FirstName"
+                                        data-lname="@u.LastName">
+                                    @u.FirstName @u.LastName
+                                </option>
+                            }
+                        </select>
                     </div>
-                }
-            }
-            else
-            {
-                <p>No pending leaves</p>
-            }
 
+                    <div class="form-group">
+                        <input type="text" id="firstName" readonly />
+                        <label>First Name</label>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" id="lastName" readonly />
+                        <label>Last Name</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="leaveType">Leave Type</label>
+                        <select name="LeaveType" id="leaveType" required>
+                            <option value="">--Select--</option>
+                            <option value="Casual">Casual</option>
+                            <option value="Sick">Sick</option>
+                            <option value="Emergency">Emergency</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" name="EmergencyContact" id="emergencyContact" required />
+                        <label for="emergencyContact">Emergency Contact</label>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="date" name="StartDate" id="startDate" required />
+                        <label for="startDate">Start Date</label>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="date" name="EndDate" id="endDate" required />
+                        <label for="endDate">End Date</label>
+                    </div>
+
+                    <div class="form-group">
+                        <textarea name="Reason" id="reason" rows="3" required></textarea>
+                        <label for="reason">Reason</label>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-save">Save Leave</button>
+                        <button type="button" class="btn btn-reset" onclick="resetForm()">Reset</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ================= Pending Leaves ================= -->
+            <div id="pendingContainer">
+                @if (Model.PendingLeaves != null && Model.PendingLeaves.Any())
+                {
+                    foreach (var item in Model.PendingLeaves)
+                    {
+                        <div class="leave-card" data-id="@item.Id">
+                            <div class="leave-header">
+                                <div>
+                                    <h3>@item.FirstName @item.LastName</h3>
+                                    <p>Engineering</p>
+                                </div>
+                                <span class="badge">@item.LeaveType</span>
+                            </div>
+
+                            <div class="leave-info">
+                                <div>
+                                    <strong>Duration</strong>
+                                    <p>@item.StartDate?.ToString("dd/MM/yyyy") - @item.EndDate?.ToString("dd/MM/yyyy")</p>
+                                </div>
+                                <div>
+                                    <strong>Applied Date</strong>
+                                    <p>@item.CreatedAt.ToString("dd/MM/yyyy")</p>
+                                </div>
+                            </div>
+
+                            <div class="reason">
+                                Reason: @item.Reason
+                            </div>
+
+                            <div class="actions">
+                                <button class="btn approve" onclick="approveLeave(@item.Id)">✔ Approve</button>
+                                <button class="btn reject" onclick="rejectLeave(@item.Id)">✖ Reject</button>
+                                <button class="btn details" onclick="viewDetails(@item.Id)">View Details</button>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>No pending leaves</p>
+                }
+            </div>
         </div>
-   
+
+
         <div id="teamSection" class="section" style="display:none;">
             <h2>Team Overview</h2>
             <p class="subtitle">All registered employees</p>
 
-         
+            <!-- ================= USER FORM ================= -->
+            <form method="post" action="/Home/SaveUser" class="user-form" autocomplete="off">
+
+                <input type="hidden" name="Id" id="UserId" />
+
+                <div class="form-group">
+                    <input type="text" name="FirstName" id="FirstName" autocomplete="off" required />
+                    <label>First Name</label>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" name="LastName" id="LastName" autocomplete="off" required />
+                    <label>Last Name</label>
+                </div>
+
+                <div class="form-group">
+                    <input type="email" name="Email" id="Email" autocomplete="off" required />
+                    <label>Email</label>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" name="Phone" id="Phone" autocomplete="off" required />
+                    <label>Phone</label>
+                </div>
+
+                <div class="form-group password-group">
+                    <input type="password" name="Password" id="Password" autocomplete="off" required />
+                    <label>Password</label>
+                    <span class="toggle-password" onclick="togglePassword()">👁️</span>
+                </div>
+
+                <button type="submit">Save User</button>
+                <button type="button" onclick="clearForm()">Clear</button>
+
+            </form>
+
+
+            <!-- ================= USERS TABLE ================= -->
             <table class="team-table">
                 <thead>
                     <tr>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
+                        <th>Password</th>
                         <th>Joined On</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                    @if (Model.Users != null && Model.Users.Any())
-                    {
-                        foreach (var user in Model.Users)
-                        {
-                            <tr>
-                                <td>@user.FirstName @user.LastName</td>
-                                <td>@user.Email</td>
-                                <td>@user.Phone</td>
-                                <td>@user.JoinedOn.ToString("dd MMM yyyy")</td>
-                            </tr>
-                        }
-                    }
-                    else
+                    @foreach (var user in Model.Users)
                     {
                         <tr>
-                            <td colspan="4" style="text-align:center;">No users found</td>
+                            <td>@user.FirstName @user.LastName</td>
+                            <td>@user.Email</td>
+                            <td>@user.Phone</td>
+                            <td>@user.Password</td>
+                            <td>@user.JoinedOn.ToString("dd MMM yyyy")</td>
+                            <td>
+                                <button type="button" onclick="editUser(
+                                        '@user.Id',
+                                        '@user.FirstName',
+                                        '@user.LastName',
+                                        '@user.Email',
+                                        '@user.Phone',
+                                        '@user.Password'
+                                    )">
+                                    ✏️
+                                </button>
+
+                                <a href="/Home/DeleteUser/@user.Id"
+                                   onclick="return confirm('Delete this user?')">🗑️</a>
+                            </td>
                         </tr>
                     }
                 </tbody>
             </table>
-
         </div>
 
-
-        
         <div id="reportsSection" class="section" style="display:none;">
             <h2>Reports</h2>
             <button onclick="downloadExcel()"
@@ -501,7 +303,7 @@
 
             <div style="margin-top: 20px;">
                 <table id="reportsTable" border="1" cellspacing="0" cellpadding="5" style="width: 100%; border-collapse: collapse;">
-                    <thead style="background-color: #f0f0f0;">
+                    <thead>
                         <tr>
                             <th>Full Name</th>
                             <th>Leave Type</th>
@@ -520,11 +322,31 @@
             </div>
         </div>
 
-  
 
-            </div>
-     </div>
-        
+        <div id="attendanceSection" class="section" style="display:none;">
+            <h2>Attendance</h2>
+            <p class="subtitle">Employee attendance records</p>
+
+            <table id="attendanceTable" border="1" cellspacing="0" cellpadding="5" style="width:100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User Name</th>
+                        <th>Punch In Date</th>
+                        <th>Punch In Time</th>
+                        <th>Punch Out Date</th>
+                        <th>Punch Out Time</th>
+                        <th>Work Hours</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceTableBody">
+                    <!-- Rows from DB will go here -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
 
 
 
@@ -537,7 +359,30 @@
         </div>
     </div>
 
-    <!-- DETAILS + EDIT MODAL -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div id="successPopup" class="success-popup">
+            ✔ @TempData["SuccessMessage"]
+        </div>
+    }
+    <script>
+        setTimeout(() => {
+            const popup = document.getElementById("successPopup");
+            if (popup) popup.style.display = "none";
+        }, 3000);
+
+
+        function togglePassword() {
+            const pwd = document.getElementById("Password");
+            pwd.type = pwd.type === "password" ? "text" : "password";
+        }
+                window.onload = function () {
+            document.getElementById("Email").value = "";
+            document.getElementById("Password").value = "";
+        };
+    </script>
+
+
     <div id="detailsModal" class="modal">
         <div class="modal-content">
             <h2>Leave Details</h2>
@@ -564,43 +409,178 @@
             <button onclick="closeDetailsModal()" class="btn reject">Cancel</button>
         </div>
     </div>
+
+
     <script>
-    const tabs = document.querySelectorAll(".tab");
+                      function loadAttendance() {
+            fetch('/Attendance/GetAttendance')
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data);
+                    let rowsHTML = "";
 
-    const pendingSection = document.getElementById("pendingSection");
-    const teamSection = document.getElementById("teamSection");
-    const reportsSection = document.getElementById("reportsSection");
+                            data.forEach(a => {
+            rowsHTML += `
+                <tr>
+                    <td>${a.attendanceId}</td>
+                    <td>${a.fullName}</td>
+                    <td>${a.punchInDate}</td>
+                    <td>${a.punchInTime}</td>
+                    <td>${a.punchOutDate || ''}</td>
+                    <td>${a.punchOutTime || ''}</td>
+                    <td>${a.workHours || ''}</td>
+                </tr>
+            `;
+        });
 
-    function hideAllSections() {
-        pendingSection.style.display = "none";
-        teamSection.style.display = "none";
-        reportsSection.style.display = "none";
 
-        tabs.forEach(t => t.classList.remove("active"));
-    }
+                    document.getElementById("attendanceTableBody").innerHTML = rowsHTML;
+                })
+                .catch(err => console.error("Error loading attendance:", err));
+        }
 
-    // Pending Tab
-    tabs[0].addEventListener("click", () => {
-        hideAllSections();
-        tabs[0].classList.add("active");
-        pendingSection.style.display = "block";
-    });
 
-    // Team Overview Tab
-    function showTeam() {
-        hideAllSections();
-        tabs[1].classList.add("active");
-        teamSection.style.display = "block";
-    }
+                    const attendanceSection = document.getElementById("attendanceSection");
+        const attendanceTab = document.getElementById("attendanceTab");
 
-    // Reports Tab
-    tabs[2].addEventListener("click", () => {
-        hideAllSections();
-        tabs[2].classList.add("active");
-        reportsSection.style.display = "block";
-        loadReports();
-    });
-</script>
+        attendanceTab.addEventListener("click", () => {
+            hideAllSections();
+            attendanceTab.classList.add("active");
+            attendanceSection.style.display = "block";
+            loadAttendance(); 
+        });
+
+
+    </script>
+
+
+
+    <script>
+        const tabs = document.querySelectorAll(".tab");
+
+        const pendingSection = document.getElementById("pendingSection");
+        const teamSection = document.getElementById("teamSection");
+        const reportsSection = document.getElementById("reportsSection");
+
+        function hideAllSections() {
+            pendingSection.style.display = "none";
+            teamSection.style.display = "none";
+            reportsSection.style.display = "none";
+             attendanceSection.style.display = "none";
+
+            tabs.forEach(t => t.classList.remove("active"));
+        }
+
+        // Pending Tab
+        tabs[0].addEventListener("click", () => {
+            hideAllSections();
+            tabs[0].classList.add("active");
+            pendingSection.style.display = "block";
+        });
+
+        // Team Overview Tab
+        function showTeam() {
+            hideAllSections();
+            tabs[1].classList.add("active");
+            teamSection.style.display = "block";
+        }
+
+        // Reports Tab
+        tabs[2].addEventListener("click", () => {
+            hideAllSections();
+            tabs[2].classList.add("active");
+            reportsSection.style.display = "block";
+            loadReports();
+        });
+
+                function editUser(id, fname, lname, email, phone, password) {
+                showTeam(); // Team tab auto open
+
+                document.getElementById("UserId").value = id;
+                document.getElementById("FirstName").value = fname;
+                document.getElementById("LastName").value = lname;
+                document.getElementById("Email").value = email;
+                document.getElementById("Phone").value = phone;
+                document.getElementById("Password").value = password;
+            }
+
+            function clearForm() {
+                document.getElementById("UserId").value = "";
+                document.getElementById("FirstName").value = "";
+                document.getElementById("LastName").value = "";
+                document.getElementById("Email").value = "";
+                document.getElementById("Phone").value = "";
+                document.getElementById("Password").value = "";
+            }
+    </script>
+
+    <script>
+                function fillUserName() {
+            const select = document.getElementById("userSelect");
+            const option = select.options[select.selectedIndex];
+
+            document.getElementById("firstName").value = option.getAttribute("data-fname") || "";
+            document.getElementById("lastName").value = option.getAttribute("data-lname") || "";
+        }
+
+                function saveLeave() {
+            const model = {
+                Id: parseInt(document.getElementById("leaveId").value || 0),
+                FirstName: document.getElementById("firstName").value,
+                LastName: document.getElementById("lastName").value,
+                LeaveType: document.getElementById("leaveType").value,
+                EmergencyContact: document.getElementById("emergencyContact").value,
+                StartDate: document.getElementById("startDate").value,
+                EndDate: document.getElementById("endDate").value,
+                Reason: document.getElementById("reason").value
+            };
+
+            fetch('/Home/SaveLeave', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(model)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Leave saved successfully');
+                    resetForm();
+                    location.reload(); // Reload to show updated pending leaves
+                } else {
+                    alert('Error saving leave');
+                }
+            });
+        }
+
+        function viewDetails(id) {
+            const card = document.querySelector(`.leave-card[data-id='${id}']`);
+            document.getElementById("leaveId").value = id;
+            document.getElementById("firstName").value = card.querySelector("h3").innerText.split(' ')[0];
+            document.getElementById("lastName").value = card.querySelector("h3").innerText.split(' ')[1];
+            document.getElementById("leaveType").value = card.querySelector(".badge").innerText;
+            document.getElementById("emergencyContact").value = card.querySelector(".leave-info div:nth-child(2) p").innerText; // adapt if you store differently
+            document.getElementById("startDate").value = card.querySelector(".leave-info div:first-child p").innerText.split(' - ')[0].split('/').reverse().join('-');
+            document.getElementById("endDate").value = card.querySelector(".leave-info div:first-child p").innerText.split(' - ')[1].split('/').reverse().join('-');
+            document.getElementById("reason").value = card.querySelector(".reason").innerText.replace('Reason: ', '');
+            document.getElementById("formTitle").innerText = "Edit Leave Request";
+        }
+
+                function resetForm() {
+            document.getElementById("leaveId").value = "";
+            document.getElementById("firstName").value = "";
+            document.getElementById("lastName").value = "";
+            document.getElementById("leaveType").value = "";
+            document.getElementById("emergencyContact").value = "";
+            document.getElementById("startDate").value = "";
+            document.getElementById("endDate").value = "";
+            document.getElementById("reason").value = "";
+            document.getElementById("formTitle").innerText = "Apply for Leave";
+        }
+
+
+    </script>
+
+
     <script>
                 function formatDate(date) {
             if (!date) return "";
@@ -678,51 +658,51 @@
         }
     </script>
 
-        
+
     <script>
-                    // ---------------------- DOWNLOAD EXCEL ----------------------
-            function downloadExcel() {
-                let reports = JSON.parse(localStorage.getItem("reports")) || [];
+                // ---------------------- DOWNLOAD EXCEL ----------------------
+        function downloadExcel() {
+            let reports = JSON.parse(localStorage.getItem("reports")) || [];
 
-                if (reports.length === 0) {
-                    alert("No reports available to download.");
-                    return;
-                }
-
-                // Excel Header
-                let csv = "Name,Department,Leave Type,Duration,Applied Date,Reason,Status,Date\n";
-
-                // Add row for each record
-                reports.forEach(r => {
-                    csv += `${r.name},${r.dept},${r.type},${r.duration},${r.applied},${r.reason},${r.status},${r.date}\n`;
-                });
-
-                // Convert CSV to downloadable Excel file
-                let blob = new Blob([csv], { type: "application/vnd.ms-excel" });
-                let url = URL.createObjectURL(blob);
-
-                let a = document.createElement("a");
-                a.href = url;
-                a.download = "Reports_Data.xls";   // Excel file name
-                a.click();
-
-                URL.revokeObjectURL(url);
+            if (reports.length === 0) {
+                alert("No reports available to download.");
+                return;
             }
 
+            // Excel Header
+            let csv = "Name,Department,Leave Type,Duration,Applied Date,Reason,Status,Date\n";
+
+            // Add row for each record
+            reports.forEach(r => {
+                csv += `${r.name},${r.dept},${r.type},${r.duration},${r.applied},${r.reason},${r.status},${r.date}\n`;
+            });
+
+            // Convert CSV to downloadable Excel file
+            let blob = new Blob([csv], { type: "application/vnd.ms-excel" });
+            let url = URL.createObjectURL(blob);
+
+            let a = document.createElement("a");
+            a.href = url;
+            a.download = "Reports_Data.xls";   // Excel file name
+            a.click();
+
+            URL.revokeObjectURL(url);
+        }
 
 
-            // ---------------------- DELETE ALL REPORTS ----------------------
-            function deleteAllReports() {
-                if (!confirm("Are you sure you want to delete all report records?")) return;
 
-                localStorage.removeItem("reports"); // delete from storage
+        // ---------------------- DELETE ALL REPORTS ----------------------
+        function deleteAllReports() {
+            if (!confirm("Are you sure you want to delete all report records?")) return;
 
-                // Clear UI
-                document.getElementById("approvedList").innerHTML = "";
-                document.getElementById("rejectedList").innerHTML = "";
+            localStorage.removeItem("reports"); // delete from storage
 
-                alert("All reports deleted successfully!");
-            }
+            // Clear UI
+            document.getElementById("approvedList").innerHTML = "";
+            document.getElementById("rejectedList").innerHTML = "";
+
+            alert("All reports deleted successfully!");
+        }
 
     </script>
 </body>

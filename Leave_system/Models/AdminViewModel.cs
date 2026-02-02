@@ -6,6 +6,8 @@ namespace Leave_system.Models
     {
         public List<User> Users { get; set; }
         public List<LeaveRequest> PendingLeaves { get; set; }
+
+        public List<Attendance> Attendance { get; set; }
     }
 }
 

@@ -66,22 +66,24 @@ namespace Leave_system.Controllers
         }
 
 
+
         [HttpPost]
-        [ValidateAntiForgeryToken] 
+        [ValidateAntiForgeryToken]
         public IActionResult Login(string email, string password)
         {
             var user = _context.Users.FirstOrDefault(u => u.Email == email);
-            if (user != null) 
+            if (user != null && user.Password == password)
             {
-                if (user.Password == password) 
-                {
-                    HttpContext.Session.SetString("UserEmail", user.Email); 
-                    /*HttpContext.Session.SetString("UserId", user.Id.ToString());*/ 
-                    return RedirectToAction("User"); 
-                }
-            } ViewBag.Error = "Invalid email or password"; 
+                HttpContext.Session.SetString("UserEmail", user.Email);
+                HttpContext.Session.SetInt32("UserId", user.Id); 
+
+                return RedirectToAction("User");
+            }
+
+            ViewBag.Error = "Invalid email or password";
             return View();
         }
+
 
         public IActionResult Logout()
         {
@@ -122,6 +124,14 @@ namespace Leave_system.Controllers
             if (leave == null)
                 return Json(new { success = false, message = "Form binding failed." });
 
+            // ⭐ Session se UserId lao
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+                return Json(new { success = false, message = "User not logged in." });
+
+            // ⭐ YAHI ROOT FIX HAI
+            leave.UserId = userId.Value;
+
             leave.Status = "Pending";
             leave.CreatedAt = DateTime.Now;
 
@@ -140,25 +150,124 @@ namespace Leave_system.Controllers
 
 
 
+        [HttpGet]
+        public IActionResult GetLeaveHistory()
+        {
+            var email = HttpContext.Session.GetString("UserEmail");
 
-        /* public IActionResult Admin()
-          {
-              var users = _context.Users.ToList();
-              return View(users);
-          }*/
+            if (email == null)
+                return Json(new { success = false, message = "User not logged in." });
+
+            var user = _context.Users.FirstOrDefault(u => u.Email == email);
+
+            if (user == null)
+                return Json(new { success = false, message = "User not found." });
+
+            // Get leave requests for this user only
+            var leaveHistory = _context.LeaveRequests
+                .Where(l => l.Id == user.Id)
+                .OrderByDescending(l => l.CreatedAt)
+                .Select(l => new
+                {
+                    l.Id,
+                    l.StartDate,
+                    l.EndDate,
+                    l.Reason,
+                    l.Status,
+                    l.CreatedAt
+                }).ToList();
+
+            return Json(new { success = true, data = leaveHistory });
+        }
 
         public IActionResult Admin()
         {
             var model = new AdminViewModel
             {
-                Users = _context.Users.ToList(),
+                // Dropdown users
+                Users = _context.Users
+                                .Select(u => new User
+                                {
+                                    Id = u.Id,
+                                    FirstName = u.FirstName,
+                                    LastName = u.LastName,
+                                    Email = u.Email,
+                                    Phone = u.Phone,
+                                    Password = u.Password
+                                }).ToList(),
+
+                // 👇 Pending leave list
                 PendingLeaves = _context.LeaveRequests
-                    .Where(l => l.Status == "Pending")
-                    .ToList()
+                                        .Where(l => l.Status == "Pending")
+                                        .OrderByDescending(l => l.CreatedAt)
+                                        .ToList()
             };
 
             return View(model);
         }
+
+    
+
+
+        [HttpPost]
+        public IActionResult SaveUser(User user)
+        {
+            if (user.Id == 0)
+            {
+                user.JoinedOn = DateTime.Now;
+                _context.Users.Add(user);
+                TempData["SuccessMessage"] = "User created successfully!";
+            }
+            else
+            {
+                var dbUser = _context.Users.FirstOrDefault(x => x.Id == user.Id);
+                if (dbUser == null) return NotFound();
+
+                dbUser.FirstName = user.FirstName;
+                dbUser.LastName = user.LastName;
+                dbUser.Email = user.Email;
+                dbUser.Phone = user.Phone;
+                dbUser.Password = user.Password;
+
+                TempData["SuccessMessage"] = "User updated successfully!";
+            }
+
+            _context.SaveChanges();
+            return RedirectToAction("Admin");
+        }
+
+
+        [HttpPost]
+        public IActionResult SaveLeave(LeaveRequest model)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.Id == model.UserId);
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "Invalid user selected!";
+                return RedirectToAction("Admin");
+            }
+
+            var leave = new LeaveRequest
+            {
+                UserId = user.Id,             // ✅ Correct UserId
+                FirstName = user.FirstName,   // ✅ From DB
+                LastName = user.LastName,
+                LeaveType = model.LeaveType,
+                EmergencyContact = model.EmergencyContact,
+                StartDate = model.StartDate,
+                EndDate = model.EndDate,
+                Reason = model.Reason,
+                Status = "Pending",
+                CreatedAt = DateTime.Now
+            };
+
+            _context.LeaveRequests.Add(leave);
+            _context.SaveChanges();
+
+            TempData["SuccessMessage"] = "Leave applied successfully!";
+            return RedirectToAction("Admin");
+        }
+
 
 
 
@@ -197,6 +306,114 @@ namespace Leave_system.Controllers
                 .ToList();
 
             return Json(data);
+        }
+
+        [HttpPost]
+        public IActionResult UpdateProfile([FromBody] User model)
+        {
+            var email = HttpContext.Session.GetString("UserEmail");
+            if (email == null)
+                return Json(new { success = false });
+
+            var user = _context.Users.FirstOrDefault(u => u.Email == email);
+            if (user == null)
+                return Json(new { success = false });
+
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.Phone = model.Phone;
+            user.Email = model.Email;
+            user.Location = model.Location;
+
+            _context.SaveChanges();
+
+            return Json(new { success = true });
+        }
+
+        [HttpGet]
+        public IActionResult GetMyReports()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userId == null)
+                return Unauthorized();
+
+            var data = _context.LeaveRequests
+    .Where(l => l.UserId == userId)  // Keep all statuses
+    .OrderByDescending(l => l.CreatedAt)
+    .Select(l => new
+    {
+        leaveType = l.LeaveType ?? "",
+        startDate = l.StartDate,
+        endDate = l.EndDate,
+        reason = l.Reason ?? "",
+        status = l.Status ?? "",
+        createdAt = l.CreatedAt
+    })
+    .ToList();
+
+
+            return Json(data);
+        }
+
+
+        [HttpGet]
+        public IActionResult GetLeaveNotifications()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+                return Unauthorized();
+
+            // Get the last few leaves that are Approved/Rejected but not yet notified
+            var notifications = _context.LeaveRequests
+                .Where(l => l.UserId == userId && (l.Status == "Approved" || l.Status == "Rejected"))
+                .OrderByDescending(l => l.CreatedAt)
+                .Take(5) // last 5 notifications
+                .Select(l => new
+                {
+                    leaveDate = l.StartDate,
+                    leaveType = l.LeaveType,
+                    status = l.Status
+                })
+                .ToList();
+
+            return Json(notifications);
+        }
+
+        [HttpGet]
+        public IActionResult GetDashboardCounts()
+        {
+            var pendingLeaves = _context.LeaveRequests.Count(l => l.Status == "Pending");
+            var teamMembers = _context.Users.Count();
+            var today = DateTime.Today;
+            var todayAttendance = _context.Attendance.Count(a => a.PunchInDate.Date == today);
+
+            return Json(new { pendingLeaves, teamMembers, todayAttendance });
+        }
+
+
+        public IActionResult Dashboard()
+        {
+            var today = DateTime.Today;
+
+            // DB se counts
+            int pendingCount = _context.LeaveRequests.Count(l => l.Status == "Pending");
+            int userCount = _context.Users.Count();
+            int todayAttendanceCount = _context.Attendance.Count(a => a.PunchInDate.Date == today);
+
+            // Send to view via ViewBag
+            ViewBag.PendingCount = pendingCount;
+            ViewBag.UserCount = userCount;
+            ViewBag.TodayAttendance = todayAttendanceCount;
+
+            // Model for rendering tables/cards
+            var model = new AdminViewModel
+            {
+                PendingLeaves = _context.LeaveRequests.Where(l => l.Status == "Pending").ToList(),
+                Users = _context.Users.ToList()
+            };
+
+            return View(model);
         }
 
 

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Leave_system.Models
 {
@@ -28,4 +29,26 @@ namespace Leave_system.Models
         public string Location { get; set; } = "Gurugram, Haryana";
 
     }
+    public class Attendance
+    {
+        public int AttendanceId { get; set; }
+        public int UserId { get; set; }
+
+       
+        public string FullName { get; set; }
+
+        
+        public DateTime PunchInDate { get; set; }
+        public TimeSpan PunchInTime { get; set; }
+
+        public DateTime? PunchOutDate { get; set; }
+        public TimeSpan? PunchOutTime { get; set; }
+
+        public decimal? WorkHours { get; set; }
+
+       
+        [ForeignKey("UserId")]
+        public User User { get; set; }
+    }
+
 }
