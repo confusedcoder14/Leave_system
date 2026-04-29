@@ -14,7 +14,7 @@
     <title>Leave Management Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link href="~/css/adminpage.css" rel="stylesheet" />
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 </head>
 
 <body>
@@ -23,10 +23,12 @@
     <div class="navbar fixed-navbar">
         <a class="active" href="@Url.Action("Admin", "Home")"><i class="fa fa-fw fa-home"></i> Home</a>
         <a href="#"><i class="fa fa-fw fa-envelope"></i> Profile</a>
-        <a href="#"><i class="fa fa-fw fa-envelope"></i> Contact</a>
-        <a href="@Url.Action("AdminLogin", "Home")"><i class="fa fa-fw fa-user"></i> Logout</a>
+        <a href="/Home/Contact"><i class="fa fa-fw fa-envelope"></i> Contact</a>
+        <a href="@Url.Action("Login", "Home")" id="logoutBtn">
+            <i class="fa fa-fw fa-user"></i> Logout
+        </a>
     </div>
-
+    <div id="toastContainer"></div>
     <div class="container" style="margin-top:80px;">
         <div class="top-cards">
             <div class="card">
@@ -138,14 +140,17 @@
                     </div>
 
                     <div class="form-group">
-                        <input type="date" name="StartDate" id="startDate" required />
-                        <label for="startDate">Start Date</label>
+                        <label>Start Date</label>
+                        <input type="text" id="startDate" readonly placeholder="Select date" onclick="showCalendar('startDate', event)" />
+
                     </div>
 
                     <div class="form-group">
-                        <input type="date" name="EndDate" id="endDate" required />
-                        <label for="endDate">End Date</label>
+                        <label>End Date</label>
+                        <input type="text" id="endDate" readonly placeholder="Select date" onclick="showCalendar('endDate', event)" />
                     </div>
+
+
 
                     <div class="form-group">
                         <textarea name="Reason" id="reason" rows="3" required></textarea>
@@ -235,61 +240,103 @@
                 </div>
 
                 <div class="form-group password-group">
-                    <input type="password" name="Password" id="Password" autocomplete="off" required />
+                    <input type="password" name="Password" id="Password" autocomplete="new-password" required />
                     <label>Password</label>
                     <span class="toggle-password" onclick="togglePassword()">👁️</span>
                 </div>
-
-                <button type="submit">Save User</button>
-                <button type="button" onclick="clearForm()">Clear</button>
-
+                <div class="form-actions">
+                <button class="btn btn-save" type="submit">Save User</button>
+                <button class="btn btn-reset" type="button" onclick="clearForm()">Clear</button>
+                </div>
             </form>
 
-
-            <!-- ================= USERS TABLE ================= -->
-            <table class="team-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Password</th>
-                        <th>Joined On</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @foreach (var user in Model.Users)
-                    {
+            <div class="teamtbl">
+                <table class="team-table">
+                    <thead>
                         <tr>
-                            <td>@user.FirstName @user.LastName</td>
-                            <td>@user.Email</td>
-                            <td>@user.Phone</td>
-                            <td>@user.Password</td>
-                            <td>@user.JoinedOn.ToString("dd MMM yyyy")</td>
-                            <td>
-                                <button type="button" onclick="editUser(
-                                        '@user.Id',
-                                        '@user.FirstName',
-                                        '@user.LastName',
-                                        '@user.Email',
-                                        '@user.Phone',
-                                        '@user.Password'
-                                    )">
-                                    ✏️
-                                </button>
-
-                                <a href="/Home/DeleteUser/@user.Id"
-                                   onclick="return confirm('Delete this user?')">🗑️</a>
-                            </td>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Password</th>
+                            <th>Joined On</th>
+                            <th>Action</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var user in Model.Users)
+                        {
+                            <tr>
+                                <td>@user.FirstName @user.LastName</td>
+                                <td>@user.Email</td>
+                                <td>@user.Phone</td>
+                                <td>@user.Password</td>
+                                <td>@user.JoinedOn.ToString("dd MMM yyyy")</td>
+                                <td>
+                                    <button type="button" onclick="editUser(
+                                            '@user.Id',
+                                            '@user.FirstName',
+                                            '@user.LastName',
+                                            '@user.Email',
+                                            '@user.Phone',
+                                            '@user.Password'
+                                        )">
+                                        ✏️
+                                    </button>
+
+                                    <a href="/Home/DeleteUser/@user.Id"
+                                       onclick="return confirm('Delete this user?')">🗑️</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div id="reportsSection" class="section" style="display:none;">
+            <div class="filter-bar">
+
+                <div class="form-group">
+                    <select id="filterUser">
+                        <option value="">-- All Users --</option>
+                        @foreach (var u in Model.Users)
+                        {
+                            <option value="@u.Id">
+                                @u.FirstName @u.LastName
+                            </option>
+                        }
+                    </select>
+                    <label>Employee Name</label>
+                </div>
+
+                <div class="form-group">
+                    <select id="filterType">
+                        <option value="">All</option>
+                        <option value="Casual">Casual</option>
+                        <option value="Sick">Sick</option>
+                        <option value="Emergency">Emergency</option>
+                    </select>
+                    <label>Leave Type</label>
+                </div>
+
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="text" id="filterStart" readonly placeholder="Select date" onclick="showCalendar('filterStart', event)" />
+                </div>
+
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="text" id="filterEnd" readonly placeholder="Select date" onclick="showCalendar('filterEnd', event)" />
+                </div>
+
+                <button onclick="applyFilter()" class="btn btn-save">Filter</button>
+                <button onclick="resetFilter()" class="btn btn-reset">Reset</button>
+
+            </div>
+
+
+
             <h2>Reports</h2>
             <button onclick="downloadExcel()"
                     style="padding:8px 15px; background:blue; color:#fff; border:none; cursor:pointer;">
@@ -301,7 +348,7 @@
                 🗑 Delete All
             </button>
 
-            <div style="margin-top: 20px;">
+            <div class="reportstbl">
                 <table id="reportsTable" border="1" cellspacing="0" cellpadding="5" style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr>
@@ -324,25 +371,59 @@
 
 
         <div id="attendanceSection" class="section" style="display:none;">
+
+            <div class="filter-bar">
+
+                <div class="form-group">
+                    <select id="attUser">
+                        <option value="">-- All Users --</option>
+                        @foreach (var u in Model.Users)
+                        {
+                            <option value="@u.Id">
+                                @u.FirstName @u.LastName
+                            </option>
+                        }
+                    </select>
+                    <label>Employee Name</label>
+                </div>
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="text" id="attStart" readonly placeholder="Select date"
+                           onclick="showCalendar('attStart', event)" />
+                </div>
+
+                <div class="form-group">
+                    <label>End Date</label>
+                    <input type="text" id="attEnd" readonly placeholder="Select date"
+                           onclick="showCalendar('attEnd', event)" />
+                </div>
+
+                <button onclick="filterAttendance()" class="btn btn-save">Filter</button>
+                <button onclick="resetAttendanceFilter()" class="btn btn-reset">Reset</button>
+
+            </div>
+
+
             <h2>Attendance</h2>
             <p class="subtitle">Employee attendance records</p>
-
-            <table id="attendanceTable" border="1" cellspacing="0" cellpadding="5" style="width:100%; border-collapse: collapse;">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>User Name</th>
-                        <th>Punch In Date</th>
-                        <th>Punch In Time</th>
-                        <th>Punch Out Date</th>
-                        <th>Punch Out Time</th>
-                        <th>Work Hours</th>
-                    </tr>
-                </thead>
-                <tbody id="attendanceTableBody">
-                    <!-- Rows from DB will go here -->
-                </tbody>
-            </table>
+            <div class="attendancetbl">
+                <table id="attendanceTable" border="1" cellspacing="0" cellpadding="5" style="width:100%; border-collapse: collapse;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User Name</th>
+                            <th>Punch In Date</th>
+                            <th>Punch In Time</th>
+                            <th>Punch Out Date</th>
+                            <th>Punch Out Time</th>
+                            <th>Work Hours</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceTableBody">
+                        <!-- Rows from DB will go here -->
+                    </tbody>
+                </table>
+            </div>
         </div>
 
     </div>
@@ -365,6 +446,7 @@
             ✔ @TempData["SuccessMessage"]
         </div>
     }
+
     <script>
         setTimeout(() => {
             const popup = document.getElementById("successPopup");
@@ -412,44 +494,162 @@
 
 
     <script>
-                      function loadAttendance() {
+
+        // ================= GLOBAL VARIABLES =================
+        let allAttendance = [];
+        let currentInput = null;
+        let currentDate = new Date();
+
+
+        // ================= LOAD ATTENDANCE =================
+        function loadAttendance() {
             fetch('/Attendance/GetAttendance')
                 .then(res => res.json())
                 .then(data => {
-                    console.log(data);
-                    let rowsHTML = "";
 
-                            data.forEach(a => {
-            rowsHTML += `
-                <tr>
-                    <td>${a.attendanceId}</td>
-                    <td>${a.fullName}</td>
-                    <td>${a.punchInDate}</td>
-                    <td>${a.punchInTime}</td>
-                    <td>${a.punchOutDate || ''}</td>
-                    <td>${a.punchOutTime || ''}</td>
-                    <td>${a.workHours || ''}</td>
-                </tr>
-            `;
-        });
+                    allAttendance = data; // 🔥 store original
 
-
-                    document.getElementById("attendanceTableBody").innerHTML = rowsHTML;
+                    renderAttendance(data);
+                    updateTopCards();
                 })
                 .catch(err => console.error("Error loading attendance:", err));
         }
 
 
-                    const attendanceSection = document.getElementById("attendanceSection");
+        // ================= RENDER TABLE =================
+        function renderAttendance(data) {
+            let rowsHTML = "";
+
+            data.forEach(a => {
+                rowsHTML += `
+                    <tr>
+                        <td>${a.attendanceId}</td>
+                        <td>${a.fullName}</td>
+                        <td>${a.punchInDate}</td>
+                        <td>${a.punchInTime}</td>
+                        <td>${a.punchOutDate || ''}</td>
+                        <td>${a.punchOutTime || ''}</td>
+                        <td>${a.workHours || ''}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById("attendanceTableBody").innerHTML = rowsHTML;
+        }
+
+
+        // ================= FILTER =================
+             
+        function filterAttendance() {
+
+            let userId = document.getElementById("attUser").value;
+            let selectedText = document.getElementById("attUser").selectedOptions[0].text.toLowerCase();
+
+            let start = document.getElementById("attStart").value;
+            let end = document.getElementById("attEnd").value;
+
+            let filtered = allAttendance.filter(a => {
+
+                let fullName = a.fullName.toLowerCase();
+
+                let matchUser = userId === "" || fullName === selectedText;
+
+                let matchStart = !start || new Date(a.punchInDate) >= new Date(start);
+                let matchEnd = !end || new Date(a.punchInDate) <= new Date(end);
+
+                return matchUser && matchStart && matchEnd;
+            });
+
+            renderAttendance(filtered);
+        }
+
+
+        // ================= RESET FILTER =================
+        function resetAttendanceFilter() {
+            document.getElementById("attUser").value = "";
+            document.getElementById("attStart").value = "";
+            document.getElementById("attEnd").value = "";
+
+            renderAttendance(allAttendance);
+        }
+
+
+        // ================= TAB CLICK =================
+        const attendanceSection = document.getElementById("attendanceSection");
         const attendanceTab = document.getElementById("attendanceTab");
 
         attendanceTab.addEventListener("click", () => {
             hideAllSections();
             attendanceTab.classList.add("active");
             attendanceSection.style.display = "block";
-            loadAttendance(); 
+            loadAttendance();
         });
 
+
+        // ================= CALENDAR =================
+        function showCalendar(type, event) {
+            currentInput = type;
+
+            const calendar = document.getElementById("startDateCalendar");
+
+            calendar.style.display = "block";
+            calendar.style.top = (event.target.getBoundingClientRect().bottom + window.scrollY) + "px";
+            calendar.style.left = (event.target.getBoundingClientRect().left) + "px";
+
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            let year = currentDate.getFullYear();
+            let month = currentDate.getMonth();
+
+            let firstDay = new Date(year, month, 1).getDay();
+            let daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            document.getElementById("monthYear").innerText =
+                currentDate.toLocaleString('default', { month: 'long' }) + " " + year;
+
+            let html = "";
+
+            for (let i = 0; i < firstDay; i++) {
+                html += `<div></div>`;
+            }
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                html += `<div class="day" onclick="selectDate(${d}, event)">${d}</div>`;
+            }
+
+            document.getElementById("calendarDays").innerHTML = html;
+        }
+
+        function selectDate(day, event) {
+            event.stopPropagation();
+
+            let date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+            let formatted = date.toISOString().split('T')[0];
+
+            document.getElementById(currentInput).value = formatted;
+
+            document.getElementById("startDateCalendar").style.display = "none";
+        }
+
+        function prevMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        document.addEventListener("click", function (e) {
+            const calendar = document.getElementById("startDateCalendar");
+
+            if (!e.target.closest(".calendar-popup") && !e.target.closest("input")) {
+                calendar.style.display = "none";
+            }
+        });
 
     </script>
 
@@ -587,35 +787,68 @@
             return new Date(date).toLocaleDateString('en-GB');
         }
 
+                let allReports = [];
+
         function loadReportsFromDB() {
             fetch('/Home/GetReports')
                 .then(res => res.json())
                 .then(data => {
-                    let rowsHTML = "";
 
-                    data.forEach(r => {
-                        let statusColor =
-                            r.status === "Approved" ? "green" :
-                            r.status === "Rejected" ? "red" : "black";
-
-                        rowsHTML += `
-                            <tr>
-                                <td>${r.firstName} ${r.lastName}</td>
-                                <td>${r.leaveType}</td>
-                                <td>${r.emergencyContact}</td>
-                                <td>${formatDate(r.startDate)}</td>
-                                <td>${formatDate(r.endDate)}</td>
-                                <td>${r.reason}</td>
-                                <td>${formatDate(r.createdAt)}</td>
-                                <td style="color:${statusColor}; font-weight:bold;">
-                                    ${r.status}
-                                </td>
-                            </tr>
-                        `;
-                    });
-
-                    document.getElementById("reportsTableBody").innerHTML = rowsHTML;
+                    allReports = data; // 🔥 store original data
+                    renderReports(data);
                 });
+        }
+
+        function renderReports(data) {
+            let rowsHTML = "";
+
+            data.forEach(r => {
+                let statusColor =
+                    r.status === "Approved" ? "green" :
+                    r.status === "Rejected" ? "red" : "black";
+
+                rowsHTML += `
+                    <tr>
+                        <td>${r.firstName} ${r.lastName}</td>
+                        <td>${r.leaveType}</td>
+                        <td>${r.emergencyContact}</td>
+                        <td>${formatDate(r.startDate)}</td>
+                        <td>${formatDate(r.endDate)}</td>
+                        <td>${r.reason}</td>
+                        <td>${formatDate(r.createdAt)}</td>
+                        <td style="color:${statusColor}; font-weight:bold;">
+                            ${r.status}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById("reportsTableBody").innerHTML = rowsHTML;
+        }
+
+        function applyFilter() {
+
+            let userId = document.getElementById("filterUser").value;
+            let selectedText = document.getElementById("filterUser").selectedOptions[0].text.toLowerCase();
+
+            let type = document.getElementById("filterType").value;
+            let start = document.getElementById("filterStart").value;
+            let end = document.getElementById("filterEnd").value;
+
+            let filtered = allReports.filter(r => {
+
+                let fullName = (r.firstName + " " + r.lastName).toLowerCase();
+
+                let matchUser = userId === "" || fullName === selectedText;
+                let matchType = type === "" || r.leaveType === type;
+
+                let matchStart = !start || new Date(r.startDate) >= new Date(start);
+                let matchEnd = !end || new Date(r.endDate) <= new Date(end);
+
+                return matchUser && matchType && matchStart && matchEnd;
+            });
+
+            renderReports(filtered);
         }
 
         loadReportsFromDB();
@@ -624,12 +857,16 @@
 
 
     <script>
-        function approveLeave(id) {
-            updateLeaveStatus(id, "Approved");
+               function approveLeave(id) {
+            if (confirm("Are you sure you want to APPROVE this leave?")) {
+                updateLeaveStatus(id, "Approved");
+            }
         }
 
         function rejectLeave(id) {
-            updateLeaveStatus(id, "Rejected");
+            if (confirm("Are you sure you want to REJECT this leave?")) {
+                updateLeaveStatus(id, "Rejected");
+            }
         }
 
         function updateLeaveStatus(id, status) {
@@ -683,19 +920,17 @@
 
             let a = document.createElement("a");
             a.href = url;
-            a.download = "Reports_Data.xls";   // Excel file name
+            a.download = "Reports_Data.xls";
             a.click();
 
             URL.revokeObjectURL(url);
         }
 
 
-
-        // ---------------------- DELETE ALL REPORTS ----------------------
         function deleteAllReports() {
             if (!confirm("Are you sure you want to delete all report records?")) return;
 
-            localStorage.removeItem("reports"); // delete from storage
+            localStorage.removeItem("reports");
 
             // Clear UI
             document.getElementById("approvedList").innerHTML = "";
@@ -705,6 +940,209 @@
         }
 
     </script>
+
+
+    <script>
+                    // 🔔 Notification Permission
+                    if (Notification.permission !== "granted") {
+                        Notification.requestPermission();
+                    }
+
+                    // 🔥 SIGNALR CONNECTION
+                    const connection = new signalR.HubConnectionBuilder()
+                        .withUrl("/leaveHub")
+                        .build();
+
+                    connection.start()
+                        .then(() => console.log("SignalR Connected ✅"))
+                        .catch(err => console.error(err));
+
+                    // 🔥 REAL-TIME EVENT RECEIVE
+                            connection.on("NewLeave", function (data) {
+
+                        // 🔥 TOAST NOTIFICATION
+                               showToast(data);
+
+                        // 🔔 Browser Notification
+                        if (Notification.permission === "granted") {
+                            new Notification("New Leave Request", {
+                                body: `${data.name} applied for ${data.leaveType}`,
+                                icon: "/images/login-img1.jpg"
+                            });
+                        }
+
+                        // 🔥 Card auto add
+                        addNewLeaveCard(data);
+                    });
+
+                    // 🔥 NEW CARD ADD FUNCTION
+                    function addNewLeaveCard(data) {
+                        const container = document.getElementById("pendingContainer");
+
+                        const html = `
+                            <div class="leave-card">
+                                <div class="leave-header">
+                                    <div>
+                                        <h3>${data.name}</h3>
+                                        <p>New Request</p>
+                                    </div>
+                                    <span class="badge">${data.leaveType}</span>
+                                </div>
+
+                                <div class="leave-info">
+                                    <div>
+                                        <strong>Duration</strong>
+                                        <p>${formatDate(data.startDate)} - ${formatDate(data.endDate)}</p>
+                                    </div>
+                                    <div>
+                                        <strong>Applied Date</strong>
+                                        <p>Just Now</p>
+                                    </div>
+                                </div>
+
+                                <div class="reason">
+                                    Reason: ${data.reason}
+                                </div>
+                            </div>
+                        `;
+
+                        container.insertAdjacentHTML("afterbegin", html);
+
+                        // count update
+                        updateTopCards();
+                    }
+
+                    function formatDate(date) {
+                        if (!date) return "";
+                        return new Date(date).toLocaleDateString('en-GB');
+                    }
+
+                         function showToast(data) {
+            const container = document.getElementById("toastContainer");
+
+            const toast = document.createElement("div");
+            toast.className = "toast";
+
+            toast.innerHTML = `
+                <div class="toast-header">
+                    <span>${data.name}</span>
+                    <span class="toast-type">${data.leaveType}</span>
+                </div>
+
+                <div class="toast-body">
+                    📅 ${formatDate(data.startDate)} - ${formatDate(data.endDate)} <br>
+                    📝 ${data.reason ? data.reason.substring(0, 40) + "..." : ""}
+                </div>
+
+                <div style="text-align:right; margin-top:8px;">
+                    <span class="toast-close" onclick="this.closest('.toast').remove()">✖</span>
+                </div>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 10000);
+        }
+                connection.on("NewLeave", function (data) {
+                    console.log("EVENT RECEIVED", data); // 👈 check this
+                    showToast(data);
+                });
+    </script>
+    <script>
+                    let currentInput = null;
+                    let currentDate = new Date();
+
+
+        function showCalendar(type, event) {
+                    currentInput = type;
+
+                    const calendar = document.getElementById("startDateCalendar");
+
+                    // 🔥 position near input
+                    calendar.style.display = "block";
+                    calendar.style.top = (event.target.getBoundingClientRect().bottom + window.scrollY) + "px";
+                    calendar.style.left = (event.target.getBoundingClientRect().left) + "px";
+
+                    renderCalendar();
+                }
+
+        function renderCalendar() {
+            let year = currentDate.getFullYear();
+            let month = currentDate.getMonth();
+
+            let firstDay = new Date(year, month, 1).getDay();
+            let daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            document.getElementById("monthYear").innerText =
+                currentDate.toLocaleString('default', { month: 'long' }) + " " + year;
+
+            let html = "";
+
+            for (let i = 0; i < firstDay; i++) {
+                html += `<div></div>`;
+            }
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                html += `<div class="day" onclick="selectDate(${d}, event)">${d}</div>`;
+            }
+
+            document.getElementById("calendarDays").innerHTML = html;
+        }
+
+                             
+        function selectDate(day, event) {
+            event.stopPropagation();
+
+            let date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+            let formatted = date.toISOString().split('T')[0];
+
+            document.getElementById(currentInput).value = formatted;
+
+            document.getElementById("startDateCalendar").style.display = "none";
+        }
+
+        function prevMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+                document.addEventListener("click", function(e) {
+                    const calendar = document.getElementById("startDateCalendar");
+
+                    if (!e.target.closest(".calendar-popup") && !e.target.closest("input")) {
+                        calendar.style.display = "none";
+                    }
+                });
+    </script>
+    
+    <script>
+                document.getElementById("logoutBtn").addEventListener("click", function (e) {
+            if (!confirm("Are you sure you want to logout?")) {
+                e.preventDefault(); // logout cancel
+            }
+        });
+    </script>
+    
+    
+    
+    <!-- GLOBAL CALENDAR -->
+    <div id="startDateCalendar" class="calendar-popup" style="display:none; position:absolute; z-index:9999;">
+        <div class="calendar-card">
+            <div class="calendar-navigation">
+                <button onclick="prevMonth()">◀</button>
+                <span id="monthYear"></span>
+                <button onclick="nextMonth()">▶</button>
+            </div>
+            <div id="calendarDays"></div>
+        </div>
+    </div>
 </body>
 
 </html>

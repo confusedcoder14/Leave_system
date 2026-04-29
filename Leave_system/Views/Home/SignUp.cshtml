@@ -1,5 +1,5 @@
 ﻿@{
-    
+
 }
 
 <!DOCTYPE html>
@@ -22,15 +22,14 @@
             background-position: center;
         }
 
-       
 
-        /* MAIN CARD */
         .main-container {
-            width: 850px;
-            margin: 50px auto;
-            height: fit-content;
-            background: #fff;
+            width: 95%;
+            max-width: 900px;
+            margin: 30px auto;
             display: flex;
+            flex-wrap: wrap;
+            background: #fff;
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
@@ -39,6 +38,7 @@
         /* LEFT PANEL */
         .left-panel {
             width: 40%;
+            min-height: 250px;
             background: linear-gradient(rgba(128,0,128,0.7), rgba(0,0,0,0.7)), url("https://images.unsplash.com/photo-1520975916090-3105956dac38") center/cover;
             color: white;
             padding: 40px;
@@ -47,15 +47,15 @@
             justify-content: center;
         }
 
-            .left-panel h2 {
-                font-size: 36px;
-                margin-bottom: 20px;
-            }
+        .left-panel h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
 
-            .left-panel p {
-                font-size: 14px;
-                opacity: 0.8;
-            }
+        .left-panel p {
+            font-size: 14px;
+            opacity: 0.8;
+        }
 
         /* RIGHT PANEL */
         .right-panel {
@@ -237,7 +237,44 @@
                 transform: rotate(360deg);
             }
         }
+        @@media (max-width: 768px) {
 
+            .main-container {
+                flex-direction: column; /* ✅ stack */
+            }
+
+            .left-panel {
+                width: 100%;
+                text-align: center;
+                padding: 30px 20px;
+            }
+
+                .left-panel h2 {
+                    font-size: 28px;
+                }
+
+            .right-panel {
+                width: 100%;
+                padding: 25px;
+            }
+
+            .form-group {
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%; /* full button */
+            }
+
+            .social-login {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+                .social-login a {
+                    border-radius: 6px !important;
+                }
+        }
     </style>
 
 </head>
@@ -261,45 +298,45 @@
             {
                 <div style="color:red;    text-align: center;">@ViewBag.Error</div>
             }
-            <form asp-action="SignUp" method="post">
+            <form asp-action="SignUp" method="post" autocomplete="off">
                 @Html.AntiForgeryToken()
                 <div class="row">
                     <div class="form-group col-sm-12 col-md-6 col-lg-6">
-                    <label>First Name</label>
-                    <input type="text" id="firstname" name="FirstName" placeholder="Enter First Name">
-                </div>
+                        <label>First Name</label>
+                        <input type="text" id="firstname" name="FirstName" placeholder="Enter First Name" autocomplete="off">
+                    </div>
 
                     <div class="form-group col-sm-12 col-md-6 col-lg-6">
-                    <label>Last Name</label>
-                    <input type="text" id="lastname" name="LastName" placeholder="Enter Last Name">
-                </div>
+                        <label>Last Name</label>
+                        <input type="text" id="lastname" name="LastName" placeholder="Enter Last Name" autocomplete="off">
+                    </div>
 
                     <div class="form-group col-sm-12 col-md-6 col-lg-6">
-                    <label>Phone No</label>
-                    <input type="text" id="phone" name="Phone" placeholder="Enter Phone Number">
-                </div>
+                        <label>Phone No</label>
+                        <input type="text" id="phone" name="Phone" placeholder="Enter Phone Number" autocomplete="off">
+                    </div>
 
                     <div class="form-group col-sm-12 col-md-6 col-lg-6">
-                    <label>Email</label>
-                    <input type="email" id="email" name="Email" placeholder="Enter Email">
-                </div>
+                        <label>Email</label>
+                        <input type="email" id="email" name="Email" placeholder="Enter Email" autocomplete="off">
+                    </div>
 
                     <div class="form-group col-sm-12 col-md-6 col-lg-6">
-                    <label>Password</label>
-                    <input type="password" id="password" name="Password" placeholder="********">
-                </div>
+                        <label>Password</label>
+                        <input type="password" id="password" name="Password" placeholder="********" autocomplete="off">
+                    </div>
 
                     <div class="form-group col-sm-12 col-md-6 col-lg-6">
-                    <label>Confirm Password</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="********">
-                </div>
+                        <label>Confirm Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="********" autocomplete="new-password">
+                    </div>
 
-                <button type="submit" class="btn">Sign Up</button>
+                    <button type="submit" class="btn">Sign Up</button>
 
-                <p class="login-text">
-                    Already have an account?
-                    <a href="/Home/Login">Sign In</a>
-                </p>
+                    <p class="login-text">
+                        Already have an account?
+                        <a href="/Home/Login">Sign In</a>
+                    </p>
 
                     <div class="google-signup">
                         <a href="#">
@@ -359,4 +396,3 @@
 
 </body>
 </html>
- 

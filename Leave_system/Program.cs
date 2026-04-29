@@ -1,11 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Leave_system.Hubs;
 using Leave_system.Models;
+using Microsoft.EntityFrameworkCore;
+using Leave_system.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // MVC
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddSignalR();
 // DB Connection ✅ (ONLY ONE)
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("dbconn"))
@@ -38,5 +40,5 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
+app.MapHub<LeaveHub>("/leaveHub");
 app.Run();

@@ -7,7 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Diagnostics;
 using System.Linq;
-
+using Microsoft.AspNetCore.SignalR;
+using Leave_system.Hubs;
 
 namespace Leave_system.Controllers
 {
@@ -15,9 +16,10 @@ namespace Leave_system.Controllers
     {
         private readonly AppDbContext _context;
 
-        public HomeController(AppDbContext context)
+        public HomeController(AppDbContext context, IHubContext<LeaveHub> hub)
         {
             _context = context;
+            _hub = hub;
         }
 
         public IActionResult Index()
@@ -26,25 +28,25 @@ namespace Leave_system.Controllers
         }
 
         [HttpGet]
-        public IActionResult SignUp() 
-        { 
-            return View(); 
+        public IActionResult SignUp()
+        {
+            return View();
         }
         [HttpPost]
-        [ValidateAntiForgeryToken] 
-        public IActionResult SignUp(User user, string confirmPassword) 
+        [ValidateAntiForgeryToken]
+        public IActionResult SignUp(User user, string confirmPassword)
         {
-            if (!ModelState.IsValid) 
-                return View(user); 
-            if (user.Password != confirmPassword) 
+            if (!ModelState.IsValid)
+                return View(user);
+            if (user.Password != confirmPassword)
             {
                 ViewBag.Error = "Passwords do not match";
-                return View(user); 
+                return View(user);
             }
-            if (_context.Users.Any(u => u.Email == user.Email)) 
+            if (_context.Users.Any(u => u.Email == user.Email))
             {
-                ViewBag.Error = "Email already exists"; 
-                return View(user); 
+                ViewBag.Error = "Email already exists";
+                return View(user);
             }
             string sql = "EXEC sp_InsertUser @FirstName, @LastName, @Phone, @Email, @Password, @Location, @JoinedOn";
             _context.Database.ExecuteSqlRaw(sql,
@@ -56,11 +58,11 @@ namespace Leave_system.Controllers
                 new SqlParameter("@Location", "Gurugram, Haryana"),
                 new SqlParameter("@JoinedOn", DateTime.Now)
             );
-            ViewBag.Success = true; 
-            return View(); 
+            ViewBag.Success = true;
+            return View();
         }
-        [HttpGet] 
-        public IActionResult Login() 
+        [HttpGet]
+        public IActionResult Login()
         {
             return View();
         }
@@ -72,16 +74,18 @@ namespace Leave_system.Controllers
         public IActionResult Login(string email, string password)
         {
             var user = _context.Users.FirstOrDefault(u => u.Email == email);
+
             if (user != null && user.Password == password)
             {
                 HttpContext.Session.SetString("UserEmail", user.Email);
-                HttpContext.Session.SetInt32("UserId", user.Id); 
+                HttpContext.Session.SetInt32("UserId", user.Id);
 
                 return RedirectToAction("User");
             }
 
-            ViewBag.Error = "Invalid email or password";
-            return View();
+            ViewBag.UserError = "Invalid email or password";   // ✅ change
+            ViewBag.ActiveTab = "user";                        // ✅ add
+            return View("Login");                              // ✅ important
         }
 
 
@@ -92,10 +96,6 @@ namespace Leave_system.Controllers
         }
 
 
-        public IActionResult AdminLogin()
-        {
-            return View();
-        }
 
         public IActionResult User()
         {
@@ -119,31 +119,31 @@ namespace Leave_system.Controllers
 
         [HttpPost]
         [Produces("application/json")]
-        public IActionResult ApplyLeave([FromForm] LeaveRequest leave)
+        public async Task<IActionResult> ApplyLeave([FromForm] LeaveRequest leave)
         {
             if (leave == null)
-                return Json(new { success = false, message = "Form binding failed." });
+                return Json(new { success = false });
 
-            // ⭐ Session se UserId lao
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
-                return Json(new { success = false, message = "User not logged in." });
+                return Json(new { success = false });
 
-            // ⭐ YAHI ROOT FIX HAI
             leave.UserId = userId.Value;
-
             leave.Status = "Pending";
             leave.CreatedAt = DateTime.Now;
 
-            try
+            _context.LeaveRequests.Add(leave);
+            _context.SaveChanges();
+
+            // 🔥 SIGNALR BROADCAST
+            await _hub.Clients.All.SendAsync("NewLeave", new
             {
-                _context.LeaveRequests.Add(leave);
-                _context.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message });
-            }
+                name = leave.FirstName + " " + leave.LastName,
+                leaveType = leave.LeaveType,
+                startDate = leave.StartDate,
+                endDate = leave.EndDate,
+                reason = leave.Reason
+            });
 
             return Json(new { success = true });
         }
@@ -180,33 +180,40 @@ namespace Leave_system.Controllers
             return Json(new { success = true, data = leaveHistory });
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AdminLogin(string admin, string password)
+        {
+            if (admin == "admin" && password == "password")
+            {
+                HttpContext.Session.SetString("Admin", "true");
+                return RedirectToAction("Admin");
+            }
+
+            ViewBag.AdminError = "Invalid admin credentials"; // ✅
+            ViewBag.ActiveTab = "admin";                      // ✅
+            return View("Login");                             // ✅
+        }
+
         public IActionResult Admin()
         {
+            var isAdmin = HttpContext.Session.GetString("Admin");
+
+            if (isAdmin != "true")
+            {
+                return RedirectToAction("Login");
+            }
+
             var model = new AdminViewModel
             {
-                // Dropdown users
-                Users = _context.Users
-                                .Select(u => new User
-                                {
-                                    Id = u.Id,
-                                    FirstName = u.FirstName,
-                                    LastName = u.LastName,
-                                    Email = u.Email,
-                                    Phone = u.Phone,
-                                    Password = u.Password
-                                }).ToList(),
-
-                // 👇 Pending leave list
+                Users = _context.Users.ToList(),
                 PendingLeaves = _context.LeaveRequests
-                                        .Where(l => l.Status == "Pending")
-                                        .OrderByDescending(l => l.CreatedAt)
-                                        .ToList()
+                    .Where(l => l.Status == "Pending")
+                    .ToList()
             };
 
             return View(model);
         }
-
-    
 
 
         [HttpPost]
@@ -238,19 +245,15 @@ namespace Leave_system.Controllers
 
 
         [HttpPost]
-        public IActionResult SaveLeave(LeaveRequest model)
+        [HttpPost]
+        public async Task<IActionResult> SaveLeave(LeaveRequest model)
         {
             var user = _context.Users.FirstOrDefault(u => u.Id == model.UserId);
-            if (user == null)
-            {
-                TempData["ErrorMessage"] = "Invalid user selected!";
-                return RedirectToAction("Admin");
-            }
 
             var leave = new LeaveRequest
             {
-                UserId = user.Id,             // ✅ Correct UserId
-                FirstName = user.FirstName,   // ✅ From DB
+                UserId = user.Id,
+                FirstName = user.FirstName,
                 LastName = user.LastName,
                 LeaveType = model.LeaveType,
                 EmergencyContact = model.EmergencyContact,
@@ -264,7 +267,16 @@ namespace Leave_system.Controllers
             _context.LeaveRequests.Add(leave);
             _context.SaveChanges();
 
-            TempData["SuccessMessage"] = "Leave applied successfully!";
+            // 🔥 SIGNALR HERE
+            await _hub.Clients.All.SendAsync("NewLeave", new
+            {
+                name = leave.FirstName + " " + leave.LastName,
+                leaveType = leave.LeaveType,
+                startDate = leave.StartDate,
+                endDate = leave.EndDate,
+                reason = leave.Reason
+            });
+
             return RedirectToAction("Admin");
         }
 
@@ -272,7 +284,8 @@ namespace Leave_system.Controllers
 
 
         [HttpPost]
-        public IActionResult UpdateLeaveStatus([FromBody] LeaveStatusVM model)
+        [HttpPost]
+        public async Task<IActionResult> UpdateLeaveStatus([FromBody] LeaveStatusVM model)
         {
             var leave = _context.LeaveRequests.FirstOrDefault(l => l.Id == model.Id);
             if (leave == null)
@@ -280,6 +293,15 @@ namespace Leave_system.Controllers
 
             leave.Status = model.Status;
             _context.SaveChanges();
+
+            // 🔥 SIGNALR TO USER
+            await _hub.Clients.All.SendAsync("LeaveStatusUpdate", new
+            {
+                name = leave.FirstName + " " + leave.LastName,
+                status = leave.Status,
+                leaveType = leave.LeaveType,
+                startDate = leave.StartDate
+            });
 
             return Json(new { success = true });
         }
@@ -291,11 +313,12 @@ namespace Leave_system.Controllers
             var data = _context.LeaveRequests
                 .Where(l => l.Status == "Approved" || l.Status == "Rejected")
                 .OrderByDescending(l => l.CreatedAt)
-                .Select(l => new {
+                .Select(l => new
+                {
                     firstName = l.FirstName ?? "",
                     lastName = l.LastName ?? "",
                     leaveType = l.LeaveType ?? "",
-                    emergencyContact = l.EmergencyContact ?? "", 
+                    emergencyContact = l.EmergencyContact ?? "",
                     startDate = l.StartDate,
                     endDate = l.EndDate,
                     reason = l.Reason ?? "",
@@ -452,5 +475,108 @@ namespace Leave_system.Controllers
                 RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
             });
         }
+
+        [HttpGet]
+        public IActionResult GetNewLeaveNotification()
+        {
+            var latestLeave = _context.LeaveRequests
+                .OrderByDescending(l => l.CreatedAt)
+                .Select(l => new
+                {
+                    name = l.FirstName + " " + l.LastName,
+                    leaveType = l.LeaveType,
+                    createdAt = l.CreatedAt
+                })
+                .FirstOrDefault();
+
+            return Json(latestLeave);
+        }
+
+        private readonly IHubContext<LeaveHub> _hub;
+
+
+        [HttpGet]
+        public IActionResult GetLeaveSummary()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userId == null)
+                return Unauthorized();
+
+            var leaves = _context.LeaveRequests
+                .Where(x => x.UserId == userId)
+                .ToList();
+
+            int totalLeaves = 24;
+
+            int taken = leaves.Count(x => x.Status == "Approved");
+            int pending = leaves.Count(x => x.Status == "Pending");
+            int rejected = leaves.Count(x => x.Status == "Rejected");
+
+            // 🔥 LOSS OF PAY LOGIC (MONTH-WISE)
+            int lossOfPay = leaves
+             .Where(x => x.Status == "Approved" && x.StartDate.HasValue)
+             .GroupBy(x => new { x.StartDate.Value.Year, x.StartDate.Value.Month })
+             .Sum(g =>
+             {
+                 int count = g.Count();
+                 return count > 2 ? count - 2 : 0;
+             });
+
+            int workedDays = 365 - taken;
+
+            return Json(new
+            {
+                totalLeaves,
+                taken,
+                pending,
+                rejected,
+                workedDays,
+                lossOfPay
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadProfileImage(IFormFile image)
+        {
+            if (image == null || image.Length == 0)
+                return Json(new { success = false, message = "No file" });
+
+            var fileName = Guid.NewGuid() + Path.GetExtension(image.FileName);
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", fileName);
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await image.CopyToAsync(stream);
+            }
+
+            var userId = HttpContext.Session.GetInt32("UserId");
+
+            // 🔥 DEBUG CHECK
+            if (userId == null)
+            {
+                return Json(new { success = false, message = "Session expired ❌" });
+            }
+
+            var user = _context.Users.FirstOrDefault(u => u.Id == userId.Value);
+
+            if (user == null)
+            {
+                return Json(new { success = false, message = "User not found ❌" });
+            }
+
+            user.ProfileImage = "/images/" + fileName;
+
+            _context.Users.Update(user);
+            _context.SaveChanges();
+
+            return Json(new { success = true, imageUrl = user.ProfileImage });
+        }
+
+
+
+
+
+
     }
 }

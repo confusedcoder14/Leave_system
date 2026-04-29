@@ -27,6 +27,7 @@ namespace Leave_system.Models
         public DateTime JoinedOn { get; set; } = DateTime.Now;
 
         public string Location { get; set; } = "Gurugram, Haryana";
+        public string? ProfileImage { get; set; }
 
     }
     public class Attendance

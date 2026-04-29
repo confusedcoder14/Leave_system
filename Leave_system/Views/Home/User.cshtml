@@ -48,7 +48,7 @@
                         <div class="user-role">Full Stack Developer</div>
                     </div>
                 </div>
-                <a href="/Home/Logout" class="logout-btn">
+                <a href="/Home/Logout" class="logout-btn" id="logoutBtn">
                     <i class="fas fa-sign-out-alt"></i>
                     Logout
                 </a>
@@ -56,6 +56,11 @@
         </header>
 
         <script>
+                        document.getElementById("logoutBtn").addEventListener("click", function (e) {
+                if (!confirm("Are you sure you want to logout?")) {
+                    e.preventDefault();
+                }
+            });
             // Simple animation for the logout button
             document.querySelector('.logout-btn').addEventListener('mouseenter', function() {
                 this.style.transform = 'translateY(-2px)';
@@ -116,8 +121,52 @@
 
 
         </script>
+        <script>
+                        document.addEventListener("DOMContentLoaded", function () {
 
-        <div class="grid">
+                const uploadInput = document.getElementById("imageUpload");
+
+                if (!uploadInput) {
+                    console.log("Input not found ❌");
+                    return;
+                }
+
+                uploadInput.addEventListener("change", function () {
+                    const file = this.files[0];
+                    if (!file) return;
+
+                    const formData = new FormData();
+                    formData.append("image", file);
+
+                    // Preview
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        document.getElementById("profileImage").src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+
+                    // Upload
+                    fetch("/Home/UploadProfileImage", {
+                        method: "POST",
+                        body: formData,
+                        credentials: "include" // 🔥 important
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log(data); // 🔥 DEBUG
+
+                        if (data.success) {
+                            document.getElementById("profileImage").src = data.imageUrl + "?t=" + new Date().getTime();
+                        } else {
+                            alert(data.message || "Upload failed ❌");
+                        }
+                    })
+                    .catch(err => console.error(err));
+                });
+
+            });
+        </script>
+        <div class="gridtab">
 
 
             @{
@@ -127,7 +176,19 @@
                         <!-- HEADER -->
                         <div class="profile-header">
                             <div class="profile-left">
-                                <img src="~/images/profile.jpg" class="profile-img" />
+                                <div class="profile-img-wrapper">
+                                    <img id="profileImage"
+                                         src="@(string.IsNullOrEmpty(Model.ProfileImage) ? Url.Content("~/images/user.png") : Url.Content("~" + Model.ProfileImage))"
+                                         class="profile-img" />
+
+                                    <!-- Edit Icon -->
+                                    <label for="imageUpload" class="edit-icon">
+                                        <i class="fas fa-camera"></i>
+                                    </label>
+
+                                    <!-- Hidden File Input -->
+                                    <input type="file" id="imageUpload" accept="image/*" hidden />
+                                </div>
 
                                 <div class="name-box">
                                     <input type="text" id="firstName" value="@Model.FirstName" disabled />
@@ -214,12 +275,12 @@
                     </div>
                 </div>
                 <div class="stats">
-                    <div><span class="value">16</span>Total Leaves</div>
-                    <div><span class="value">10</span>Taken</div>
-                    <div><span class="value">2</span>Absent</div>
-                    <div><span class="value">0</span>Request</div>
-                    <div><span class="value">240</span>Worked Days</div>
-                    <div><span class="value">2</span>Loss of Pay</div>
+                    <div><span class="value" id="totalLeaves">24</span>Total Leaves</div>
+                    <div><span class="value" id="takenLeaves">0</span>Taken</div>
+                    <div><span class="value" id="rejectedLeaves">0</span>Rejected</div>
+                    <div><span class="value" id="pendingLeaves">0</span>Request</div>
+                    <div><span class="value" id="workedDays">0</span>Worked Days</div>
+                    <div><span class="value" id="lossOfPay">0</span>Loss of Pay</div>
                 </div>
                 <a href="#" class="btn" id="openFormBtn"><i class="fas fa-plus-circle"></i> Apply New Leave</a>
                 <a href="#" class="leave-history-btn" id="viewLeaveHistoryBtn">View Leave History</a>
@@ -1035,6 +1096,27 @@
         </div>
     </div>
 
+    <script>
+        function loadLeaveSummary() {
+            fetch('/Home/GetLeaveSummary')
+                .then(res => res.json())
+                .then(data => {
+
+                    document.getElementById('totalLeaves').textContent = data.totalLeaves; // always 24
+                    document.getElementById('takenLeaves').textContent = data.taken;
+                    document.getElementById('rejectedLeaves').textContent = data.rejected;
+                    document.getElementById('pendingLeaves').textContent = data.pending;
+                    document.getElementById('workedDays').textContent = data.workedDays;
+                    document.getElementById('lossOfPay').textContent = data.lossOfPay;
+
+                })
+                .catch(err => console.error("Error loading summary:", err));
+        }
+                window.addEventListener('load', function () {
+            loadLeaveSummary();
+        });
+
+    </script>
 
     <script>
         // ========== MODAL CONTROL FUNCTIONS ==========
@@ -1802,7 +1884,49 @@
               
         });
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
 
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/leaveHub")
+            .build();
+
+        connection.start()
+            .then(() => console.log("User Connected ✅"))
+            .catch(err => console.error(err));
+
+        // 🔥 RECEIVE NOTIFICATION
+        connection.on("NewLeave", function (data) {
+
+            const alertDiv = document.getElementById('leaveAlert');
+            const messageSpan = document.getElementById('leaveMessage');
+
+            messageSpan.innerHTML = `
+                ${data.name} applied for ${data.leaveType}
+            `;
+
+            alertDiv.style.display = "block";
+
+            setTimeout(() => {
+                alertDiv.style.display = "none";
+            }, 5000);
+        });
+                connection.on("LeaveStatusUpdate", function (data) {
+
+            const alertDiv = document.getElementById('leaveAlert');
+            const messageSpan = document.getElementById('leaveMessage');
+
+            messageSpan.innerHTML = `
+                ✅ Your ${data.leaveType} leave has been <b>${data.status}</b>
+            `;
+
+            alertDiv.style.display = "block";
+
+            setTimeout(() => {
+                alertDiv.style.display = "none";
+            }, 5000);
+        });
+    </script>
 </body>
 
 </html>

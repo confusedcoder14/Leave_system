@@ -1,24 +1,26 @@
 ﻿
 @{
-    Layout = null;
+   
 }
 <!DOCTYPE html>
 <html>
-
 <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>User Login</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background-color: #6195adba;
             font-family: 'Arial';
             background-image: url('/images/login-img1.jpg');
-            background-size: cover; /* full screen cover */
-            background-repeat: no-repeat; /* repeat band */
+            background-size: cover;
+            background-repeat: no-repeat;
             background-position: center;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
-
         .imgcontainer {
             text-align: center;
             margin: 24px 0 12px 0;
@@ -28,20 +30,15 @@
             width: 10%;
             border-radius: 50%;
         }
-
-
         .login {
-            width: 382px;
-            overflow: hidden;
-            margin: auto;
-            margin: 20px 0 0 450px;
-            padding: 80px;
-            background: rgba(244, 243, 243, 0.619);
+            width: 90%;
+            max-width: 420px;
+            padding: 20px;
+            background: rgba(244, 243, 243, 0.75);
             border-radius: 15px;
-            backdrop-filter: blur(4px);
-            display: flex;
-            justify-content: center;
+            backdrop-filter: blur(6px);
         }
+
 
         h2 {
             text-align: center;
@@ -54,34 +51,24 @@
             font-size: 17px;
         }
 
-        #EmailId {
-            width: 305px;
-            height: 30px;
-            border: none;
-            border-radius: 3px;
-            padding-left: 8px;
-        }
-
+        #EmailId,
         #Password {
-            width: 305px;
-            height: 30px;
+            width: 100%;
+            height: 42px;
             border: none;
-            border-radius: 3px;
-            padding-left: 8px;
+            border-radius: 8px;
+            padding: 0 12px;
+            box-sizing: border-box;
         }
-
         #log {
-            width: 300px;
-            height: 30px;
-            border: none;
-            border-radius: 50px;
-            padding-left: 7px;
-            color: rgb(0, 0, 0);
-            font-size: 15px;
+            width: 100%;
+            height: 45px;
+            border-radius: 30px;
+            font-size: 18px;
+            background-color: #2e9a43;
             font-weight: bold;
             text-align: center;
-            font-size: 20px;
-            background-color: #2e9a43;
+            color: rgb(0, 0, 0);
         }
 
             #log:hover {
@@ -105,41 +92,103 @@
             justify-content: end;
         }
 
-        h1 {
+        .head-back h1 {
             color: white;
             text-align: right;
+            margin-bottom: -10px;
+            padding: 10px 0px 0px 0px;
             letter-spacing: 4px;
+            align-items: center;
         }
 
         .head-back {
-            height: 80px;
             background-color: #6234ec62;
             backdrop-filter: blur(4px);
+            flex-shrink: 0;
         }
 
-        .admin-heading {
-            color: black;
-            font-size: 23px;
-            margin-top: -15%;
-            text-align: left;
-            align-items: left;
-            text-decoration: none;
-            font-weight: 600;
-            border: none;
-            border-bottom: 1px solid #555;
+        .admin-user-wrapper {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
         }
 
-        .user-heading {
-            text-align: right;
-            align-items: right;
-            margin-left: 60%;
-            margin-top: -15%;
-            text-decoration: none;
-            font-size: 23px;
-            font-weight: 600;
-            color: black;
-            border: none;
+        .admin-heading, .user-heading {
+            font-size: 16px;
             border-bottom: 1px solid #555;
+            padding-bottom: 3px;
+            text-decoration: none;
+        }
+        @@media (max-width:767px){
+            body {
+                background-size: cover;
+                background-position: center;
+                min-height: 100vh;
+            }
+        }
+
+        .login-switch {
+            display: flex;
+            margin-bottom: 20px;
+            background: #eee;
+            border-radius: 30px;
+            overflow: hidden;
+        }
+
+            .login-switch button {
+                flex: 1;
+                padding: 10px;
+                border: none;
+                background: transparent;
+                cursor: pointer;
+                font-weight: 600;
+                transition: 0.3s;
+            }
+
+                .login-switch button.active {
+                    background: linear-gradient(45deg, #007bff, #00c6ff);
+                    color: white;
+                }
+
+        input {
+            width: 100%;
+            height: 42px;
+            margin-bottom: 15px;
+            padding: 0 10px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            height: 45px;
+            border-radius: 25px;
+            border: none;
+            background: #2e9a43;
+            font-weight: bold;
+        }
+
+        .form-links {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        .forgot-link {
+            font-size: 14px;
+            text-decoration: none;
+            color: #d11a2a;
+            transition: 0.3s;
+        }
+
+            .forgot-link:hover {
+                text-decoration: underline;
+            }
+        .page-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
     </style>
 </head>
@@ -154,92 +203,104 @@
             <br>
         </marquee>
     </div>
-    <div class="imgcontainer">
-        <img src="~/images/avatar.jpg" alt="Avatar" class="avatar">
-    </div>
     @{
         ViewData["Title"] = "Login";
     }
-    @if (ViewBag.Error != null)
-    {
-        <div style="color:red">@ViewBag.Error</div>
-    }
+    
+    <div class="page-center">
+
     <div class="login">
-        <form id="login" asp-action="Login" method="post">
+
+        <!-- SWITCH BUTTONS -->
+        <div class="login-switch">
+            <button id="userBtn" class="active">User Login</button>
+            <button id="adminBtn">Admin Login</button>
+        </div>
+
+        <!-- USER FORM -->
+        <form id="userForm" asp-action="Login" method="post">
             @Html.AntiForgeryToken()
-            <a href="@Url.Action("AdminLogin", "Home")" class="admin-heading">Admin Login</a>
-            <a href="@Url.Action("Login", "Home")" class="user-heading">User Login</a>
-            <br>
-            <br>
-            <label> <b> Email Id </b>
-            </label>
-            <input type="text" name="email" id="EmailId" required placeholder="Enter Email Id">
-            <br><br>
-            <label>  <b>  Password </b>
-            </label>
-            <input type="Password" name="password" id="Password" required placeholder="Password">
-            <br><br>
-            <button type="submit" class="submit-btn" name="log" id="log" value="Login">Log In</button>
-            <br><br>
-            <br><br>
-            <input type="checkbox" id="check">
-            <span>Remember me</span>
-            </br>
-            <div class="ishift"><a href="/">← Back to Home</a></div>
-            <div class="rshift"><a href="@Url.Action("ForgotPass", "Home")">Forgot Password</a></div>
-        </form>
-        @* <form id="login" onsubmit="auth()">
-            <a href="@Url.Action("AdminLogin", "Home")" class="admin-heading">Admin Login</a>
-            <a href="@Url.Action("Login", "Home")" class="user-heading">User Login</a>
-            <br>
-            <br>
-            <label>
-                <b>
-                    Email Id
-                </b>
-            </label>
-            <input type="text" name="Email Id" id="EmailId" required placeholder="Enter Email Id">
-            <br><br>
-            <label>
-                <b>
-                    Password
-                </b>
-            </label>
-            <input type="Password" name="password" id="Password" required placeholder="Password">
-            <br><br>
-            <a onclick="auth()" class="submit-btn" name="log" id="log" value="Login">Log In</a>
-            <br><br>
-            <br><br>
-            <input type="checkbox" id="check">
-            <span>Remember me</span>
-            <br></br>
-            <div class="ishift"><a href="/">← Back to Home</a></div>
-            <div class="rshift"><a href="@Url.Action("ForgotPass", "Home")">Forgot Password</a></div>
-        </form>
- *@
+            @if (ViewBag.UserError != null)
+            {
+                <div style="color:red; margin-bottom:10px;">
+                    @ViewBag.UserError
+                </div>
+            }
+            <label>Email Id</label>
+            <input type="text" name="email" required placeholder="Enter Email">
 
+            <label>Password</label>
+            <input type="password" name="password" required placeholder="Password">
 
+            <button type="submit" class="submit-btn">Login as User</button>
+
+            <div class="form-links">
+                <a href="@Url.Action("ForgotPass", "Home")" class="forgot-link">
+                    Forgot Password?
+                </a>
+            </div>
+        </form>
+
+        <!-- ADMIN FORM -->
+        <form id="adminForm" asp-action="AdminLogin" method="post" style="display:none;">
+            @Html.AntiForgeryToken()
+            @if (ViewBag.AdminError != null)
+            {
+                <div style="color:red; margin-bottom:10px;">
+                    @ViewBag.AdminError
+                </div>
+            }
+            <label>Admin Id</label>
+            <input type="text" name="admin" required placeholder="Enter Admin Id">
+
+            <label>Password</label>
+            <input type="password" name="password" required placeholder="Password">
+
+            <button type="submit" class="submit-btn">Login as Admin</button>
+
+            <div class="form-links">
+                <a href="@Url.Action("ForgotPass", "Home")" class="forgot-link">
+                    Forgot Password?
+                </a>
+            </div>
+        </form>
 
     </div>
-    @* <script>
-        function auth() {
 
-            var EmailId = document.getElementById("EmailId").value;
-            var Password = document.getElementById("Password").value;
+    </div>
+    <script>
+        const userBtn = document.getElementById("userBtn");
+        const adminBtn = document.getElementById("adminBtn");
 
-            if (EmailId === "user" && Password === "password") {
-                location.assign(`@Url.Action("User", "Home")`)
-                alert("Login successful")
-            }
-            else {
-                alert("Invalid. Please try again.");
-            }
+        const userForm = document.getElementById("userForm");
+        const adminForm = document.getElementById("adminForm");
+
+        function showUser() {
+            userForm.style.display = "block";
+            adminForm.style.display = "none";
+            userBtn.classList.add("active");
+            adminBtn.classList.remove("active");
+        }
+
+        function showAdmin() {
+            userForm.style.display = "none";
+            adminForm.style.display = "block";
+            adminBtn.classList.add("active");
+            userBtn.classList.remove("active");
+        }
+
+        userBtn.onclick = showUser;
+        adminBtn.onclick = showAdmin;
+
+        // 👇 YE LINE SABSE IMPORTANT HAI
+        var activeTab = "@ViewBag.ActiveTab";
+
+        if (activeTab === "admin") {
+            showAdmin();
+        } else {
+            showUser();
         }
     </script>
- *@
-
-
-    
 
 </body>
 

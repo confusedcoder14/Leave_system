@@ -12,7 +12,9 @@ body {
     font-family: 'Inter', sans-serif;
     margin: 0;
 }
-
+body {
+    overflow: visible !important;
+}
 /* Add a subtle shadow and rounded corners to main container */
 .container {
     background: rgba(255,255,255,0.85);
@@ -24,6 +26,13 @@ body {
     margin-top: 80px; /* Add margin-top to avoid overlap with fixed navbar */
 }
 
+.filter-bar {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    align-items: center;
+}
 /* Navbar styling */
 .navbar {
     background: rgba(30, 41, 59, 0.95);
@@ -78,6 +87,180 @@ body {
     text-align: left;
 }
 
+
+.reportstbl, .attendancetbl, .teamtbl {
+    margin-top: 20px;
+    overflow-y: auto;
+    height: 600px;
+    background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    overflow-x: auto;
+    margin-top: 20px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Inter', sans-serif;
+}
+thead {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+}
+
+    thead th {
+        padding: 14px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 14px;
+        letter-spacing: 0.5px;
+    }
+tbody tr {
+    border-bottom: 1px solid #eee;
+    transition: 0.3s;
+}
+
+    tbody tr:hover {
+        background: #f9fafb;
+        transform: scale(1.01);
+    }
+td {
+    padding: 12px 14px;
+    font-size: 13px;
+    color: #333;
+}
+tbody tr:nth-child(even) {
+    background: #f3f4f6;
+}
+td button {
+    border: none;
+    background: #3b82f6;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: 0.3s;
+}
+
+    td button:hover {
+        background: #2563eb;
+    }
+
+td a {
+    color: red;
+    font-size: 16px;
+    text-decoration: none;
+}
+td span.status-approved {
+    color: green;
+    font-weight: bold;
+}
+
+td span.status-rejected {
+    color: red;
+    font-weight: bold;
+}
+
+
+.calendar-popup {
+    position: absolute;
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 10px 25px;
+    display: none;
+    z-index: 999;
+}
+
+
+.calendar-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+#calendarDays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.day {
+    padding: 8px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+    .day:hover {
+        background: #4f46e5;
+        color: white;
+    }
+
+
+
+#toastContainer {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 99999; /* 🔥 HIGH PRIORITY */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+@keyframes slideIn {
+    from {
+        transform: translateX(120%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+.toast {
+    width: 320px;
+    background: white;
+    color: #333;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    animation: slideIn 0.4s ease;
+    font-size: 14px;
+    border-left: 6px solid #2e9a43;
+}
+
+
+.toast-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.toast-type {
+    background: #2e9a43;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.toast-body {
+    font-size: 13px;
+    color: #555;
+}
+
+.toast-close {
+    cursor: pointer;
+    font-size: 14px;
+    color: red;
+}
     .card h3 {
         margin: 0 0 8px 0;
         font-weight: 600;
@@ -385,24 +568,18 @@ body {
     /* LABEL */
     .form-group label {
         position: absolute;
-        top: 50%;
+        /* top: 50%; */
         left: 12px;
-        color: #777;
+        color: #6366f1;
         font-size: 13px;
-        background: #fff;
+        background: #f6f6f9;
         padding: 0 5px;
         transform: translateY(-50%);
         transition: 0.2s;
         pointer-events: none;
     }
 
-    /* FLOAT EFFECT */
-    .form-group input:focus + label,
-    .form-group input:valid + label {
-        top: -6px;
-        font-size: 11px;
-        color: #007bff;
-    }
+   
 
 /* PASSWORD EYE */
 .password-group {
@@ -507,7 +684,27 @@ body {
 
 
 
-    .leave-form select,
+.form-group select {
+    width: 100%;
+    padding: 14px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: transparent;
+}
+
+
+
+    .leave-form select {
+        width: 100%;
+        padding: 14px 12px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        background: transparent;
+    }
+
+
     .leave-form textarea {
         width: 100%;
         padding: 8px 10px;

@@ -9,7 +9,80 @@ body {
     background: #f5f7fb;
 }
 
-/* NAVBAR */
+.navbar {
+    padding: 12px 0;
+}
+
+.navbar-brand {
+    font-size: 22px;
+}
+
+.nav-link {
+    font-weight: 500;
+}
+
+@media (max-width: 991px) {
+
+    .navbar-toggler {
+        border: none;
+        outline: none;
+    }
+
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+
+    .mobile-menu {
+        margin-top: 15px;
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        animation: slideDown 0.3s ease;
+    }
+
+        .mobile-menu .nav-link {
+            padding: 12px 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+            .mobile-menu .nav-link:hover {
+                background: #f5f7fa;
+                padding-left: 15px;
+            }
+
+        .mobile-menu .btn {
+            width: 100%;
+            margin-top: 10px;
+            border-radius: 10px;
+        }
+
+        .mobile-menu .btn-outline-primary {
+            border: 1px solid #007bff;
+        }
+
+        .mobile-menu .btn-primary {
+            background: linear-gradient(45deg, #007bff, #00c6ff);
+            border: none;
+        }
+    /* Animation */
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}
+
+}
+
 .navbar {
     display: flex;
     justify-content: space-between;

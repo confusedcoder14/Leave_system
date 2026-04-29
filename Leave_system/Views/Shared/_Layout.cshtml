@@ -9,19 +9,56 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Leave_system.styles.css" asp-append-version="true" />
     <link href="~/css/homepage.css" rel="stylesheet" />
+    
 </head>
 <body>
 
     <!-- NAVBAR -->
-    <header class="navbar">
-        <div class="logo">LeaveMS</div>
-        <nav>
-            <a href="/">Home</a>
-            <a href="/Home/About">About</a>
-            <a href="/Home/Features">Features</a>
-            <a href="/Home/Contact">Contact</a>
-            <a href="/Home/Login" class="btn-login">Login</a>
-            <a href="/Home/SignUp" class="btn-signup">Sign Up</a>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+            <div class="container">
+
+                <!-- Logo -->
+                <a class="navbar-brand fw-bold" href="/">LeaveMS</a>
+
+                <!-- Toggle Button -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Navbar Links -->
+                <div class="collapse navbar-collapse justify-content-end mobile-menu" id="navbarContent">
+                    <ul class="navbar-nav align-items-lg-center gap-lg-3">
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Home</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Home/About">About</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Home/Features">Features</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="/Home/Contact">Contact</a>
+                        </li>
+
+                        <!-- Buttons -->
+                        <li class="nav-item">
+                            <a href="/Home/Login" class="btn btn-outline-primary ms-lg-3">Login</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="/Home/SignUp" class="btn btn-primary ms-lg-2">Sign Up</a>
+                        </li>
+
+                    </ul>
+                </div>
+
+            </div>
         </nav>
     </header>
 
